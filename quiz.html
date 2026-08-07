@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz &amp; Reflection · Beyond Orbit</title>
+<meta name="description" content="A quiz generated fresh from the codex every time, plus a written reflection for MRS THORN BIRD and MR PENGUIN.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📝</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <div class="wrap">
+    <h1>📝 Quiz &amp; Reflection</h1>
+    <p class="muted">The questions are generated from the codex when you press start, so no two attempts are identical
+       and there is nothing to memorise but the universe itself.</p>
+
+    <section class="card" id="quiz-card">
+      <div class="codex-toolbar">
+        <div class="field" style="flex:0 0 170px">
+          <label for="q-count">Questions</label>
+          <select id="q-count"><option>5</option><option selected>10</option><option>15</option><option>20</option></select>
+        </div>
+        <div class="field" style="flex:0 0 220px">
+          <label for="q-topic">Topic</label>
+          <select id="q-topic">
+            <option value="all">Everything</option>
+            <option value="worlds">Worlds &amp; moons</option>
+            <option value="missions">Missions &amp; machines</option>
+            <option value="people">People who found the sky</option>
+            <option value="deep">Deep sky &amp; theory</option>
+          </select>
+        </div>
+        <button class="btn primary" id="btn-start">Start the quiz</button>
+        <button class="btn ghost small" id="btn-narrate-q">🔊 Read questions aloud</button>
+      </div>
+      <div id="quiz-body" class="mt"></div>
+    </section>
+
+    <section class="card mt">
+      <h2>✍️ Your reflection</h2>
+      <p>MRS THORN BIRD and MR PENGUIN both want to hear from you. What did you learn about space, satellites,
+         planets or quantum technology — and what did it make you feel?</p>
+      <div class="field">
+        <label for="reflection">Write freely. It is saved against your cadet name in this browser.</label>
+        <textarea id="reflection" rows="8" placeholder="Write here…"></textarea>
+      </div>
+      <p class="lesson-actions">
+        <button class="btn primary" id="btn-save-reflection">Save my answer</button>
+        <span class="muted" id="reflection-status"></span>
+      </p>
+    </section>
+
+    <section class="card mt" id="others-card"></section>
+  </div>
+</main>
+<script type="module" src="assets/js/page-quiz.js"></script>
+</body>
+</html>

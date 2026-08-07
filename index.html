@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beyond Orbit: A Tale of Two Souls</title>
+<meta name="description" content="A living cosmic classroom: real 3D solar system, live satellite tracking, NASA open data and a mesh of 500+ agents you can talk to.">
+<meta name="theme-color" content="#05030f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🌌</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <div class="wrap">
+
+    <section class="hero">
+      <div>
+        <p class="pill-row"><span class="chip thorn">🪶 Emotion</span><span class="chip penguin">🐧 Logic</span><span class="chip gold">🧑‍🚀 You</span></p>
+        <h1 class="gradient-text">Beyond Orbit</h1>
+        <h2 style="margin-top:-.4rem">A Tale of Two Souls</h2>
+        <p>MRS THORN BIRD is the poetic cosmos — planets, sacrifice, the vastness that makes you quiet.
+           MR PENGUIN is the cold engineering — rockets, satellites, quantum links, numbers that have to be right.
+           <b>USERKIMCHI</b>, the student, is the bridge between feeling and knowing.</p>
+        <p class="poetic">“When emotion and practicality teach together, the student can reach the stars.”</p>
+        <p class="lesson-actions">
+          <a class="btn primary" href="classroom.html">🪐 Enter the Cosmic Classroom</a>
+          <a class="btn ice" href="cosmos.html">🌍 Fly the live Solar System</a>
+          <a class="btn ghost" href="about.html">📖 The legend</a>
+        </p>
+        <p class="hint" id="welcome-line"></p>
+      </div>
+      <div class="hero-orb" aria-hidden="true"><span class="moon"></span></div>
+    </section>
+
+    <section class="card mt" id="live-strip">
+      <h2>🛰️ Right now, above your head</h2>
+      <p class="muted">Computed in this browser from live public data. Nothing here is a stock number.</p>
+      <div class="grid three mt" id="live-metrics">
+        <div class="metric"><div class="label">Loading</div><div class="value">…</div></div>
+      </div>
+    </section>
+
+    <section class="grid three mt" id="feature-grid"></section>
+
+    <section class="card mt">
+      <h2>🤖 The Beyond Orbit mesh</h2>
+      <p id="mesh-summary" class="muted">Counting agents…</p>
+      <div class="stat-strip mt" id="mesh-stats"></div>
+      <p class="mt">Press the 🛰️ button in the corner, or say <b>“Jarvis”</b> out loud, and ask it anything —
+         a satellite's position, a transfer burn, who builds radar satellites in Finland, or Python code you can run.</p>
+      <p class="lesson-actions">
+        <a class="btn primary" href="agents.html">Open the agent console</a>
+        <a class="btn ghost" href="mission-control.html">📡 Mission Control</a>
+        <a class="btn ghost" href="codex.html">📚 Search the codex</a>
+      </p>
+    </section>
+
+    <section class="two-souls mt">
+      <article class="card thorn">
+        <h2>🪶 MRS THORN BIRD</h2>
+        <p>The legend says the thorn bird searches its whole life for the sharpest thorn, then sings its most beautiful
+           song while dying. The most beautiful things are born from sacrifice.</p>
+        <p>She teaches the universe: galaxies, cosmic layers, dark energy, the web that holds everything.</p>
+        <p><a class="btn small" href="mrs-thorn-bird-1.html">Begin her 8 lessons →</a></p>
+      </article>
+      <article class="card penguin">
+        <h2>🐧 MR PENGUIN</h2>
+        <p>Cold, practical, precise — and feels more than he admits. He builds rockets, satellites and quantum links,
+           and insists the history is told with its guilt included.</p>
+        <p>He teaches the technology: from Aryabhata to quantum satellites, in 11 levels.</p>
+        <p><a class="btn small ice" href="mr-penguin-1.html">Begin his 11 lessons →</a></p>
+      </article>
+    </section>
+
+    <section class="card mt" id="progress-card"></section>
+
+  </div>
+</main>
+<script type="module" src="assets/js/page-home.js"></script>
+</body>
+</html>
