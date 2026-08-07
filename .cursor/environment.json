@@ -1,0 +1,17 @@
+{
+  "name": "Beyond Orbit",
+  "install": "python3 --version",
+  "terminals": [
+    {
+      "name": "web",
+      "command": "python3 -m http.server 8080",
+      "description": "Serves the Beyond Orbit static site over HTTP at http://localhost:8080. The app uses ES modules, an import map and a service worker, so it must be served over HTTP rather than opened as a file:// path."
+    }
+  ],
+  "ports": [
+    {
+      "name": "web",
+      "port": 8080
+    }
+  ]
+}
