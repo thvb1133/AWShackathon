@@ -34,6 +34,7 @@ import {
 } from "./orbit.js";
 import { PLANETS } from "./universe.js";
 import { SPACEPORTS, OBSERVATORIES, GROUND_NETWORKS, rotationBoost } from "./facilities.js";
+import { classify } from "./qml.js";
 import * as live from "./live.js";
 
 /* ------------------------------------------------------------------
@@ -64,6 +65,7 @@ const report = (title, lines, extra = {}) => ({ title, lines, ...extra });
 const SKILLS = [
   {
     id: "skill-orbit-velocity",
+    kind: "calculate",
     name: "Orbital Velocity Engineer",
     domain: "astrodynamics",
     blurb: "Speed, period and escape velocity for any circular Earth orbit.",
@@ -84,6 +86,7 @@ const SKILLS = [
   },
   {
     id: "skill-hohmann",
+    kind: "calculate",
     name: "Transfer Trajectory Planner",
     domain: "astrodynamics",
     blurb: "Two-burn Hohmann transfers between Earth orbits, with fuel cost.",
@@ -104,6 +107,7 @@ const SKILLS = [
   },
   {
     id: "skill-rocket-equation",
+    kind: "calculate",
     name: "Tsiolkovsky Analyst",
     domain: "propulsion",
     blurb: "Δv, mass ratio and propellant mass from the 1903 rocket equation.",
@@ -126,6 +130,7 @@ const SKILLS = [
   },
   {
     id: "skill-launch-window",
+    kind: "calculate",
     name: "Interplanetary Window Analyst",
     domain: "mission design",
     blurb: "Synodic periods and transfer times between any two planets.",
@@ -150,6 +155,7 @@ const SKILLS = [
   },
   {
     id: "skill-link-budget",
+    kind: "calculate",
     name: "Deep Space Link Engineer",
     domain: "communications",
     blurb: "Signal travel time and free-space path loss for any distance.",
@@ -172,6 +178,7 @@ const SKILLS = [
   },
   {
     id: "skill-satellite-tracker",
+    kind: "live",
     name: "Live Satellite Tracker",
     domain: "tracking",
     blurb: "Where any tracked satellite is right now, from live NORAD elements.",
@@ -213,6 +220,7 @@ const SKILLS = [
   },
   {
     id: "skill-pass-predictor",
+    kind: "live",
     name: "Visible Pass Predictor",
     domain: "tracking",
     blurb: "When a satellite will rise above the horizon for your coordinates.",
@@ -240,6 +248,7 @@ const SKILLS = [
   },
   {
     id: "skill-planet-position",
+    kind: "calculate",
     name: "Ephemeris Computer",
     domain: "astrodynamics",
     blurb: "Where any planet is today, and how far away it is from Earth.",
@@ -264,10 +273,14 @@ const SKILLS = [
   },
   {
     id: "skill-debris-risk",
+    kind: "live",
     name: "Orbital Congestion Analyst",
     domain: "space safety",
     blurb: "How crowded a shell of orbit is, from live catalogue counts.",
-    keys: ["debris", "congestion", "collision", "crowded", "kessler", "traffic", "conjunction", "how many satellites"],
+    keys: [
+      "debris", "congestion", "collision", "crowded", "kessler", "traffic", "conjunction",
+      "how crowded", "how many satellites", "how many objects", "low earth orbit", "orbital shell",
+    ],
     async run() {
       const res = await live.tleGroup("active", 400);
       if (!res.ok) return report("Congestion analyst", ["The active catalogue is unreachable."]);
@@ -295,6 +308,7 @@ const SKILLS = [
   },
   {
     id: "skill-code-writer",
+    kind: "code",
     name: "Flight Software Author",
     domain: "engineering",
     blurb: "Writes runnable Python or JavaScript for the task you describe.",
@@ -437,6 +451,7 @@ console.log(circular(400));`;
   },
   {
     id: "skill-mission-architect",
+    kind: "calculate",
     name: "Mission Architect",
     domain: "mission design",
     blurb: "Turns a mission goal into an outline architecture with real numbers.",
@@ -465,6 +480,7 @@ console.log(circular(400));`;
   },
   {
     id: "skill-scale",
+    kind: "calculate",
     name: "Cosmic Scale Translator",
     domain: "education",
     blurb: "Converts astronomical distances into something a human can feel.",
@@ -486,6 +502,7 @@ console.log(circular(400));`;
   },
   {
     id: "skill-gravity",
+    kind: "calculate",
     name: "Surface Conditions Analyst",
     domain: "planetary science",
     blurb: "Gravity, weight and escape velocity on any world in the codex.",
@@ -515,6 +532,7 @@ console.log(circular(400));`;
   },
   {
     id: "skill-timeline",
+    kind: "lookup",
     name: "Space History Archivist",
     domain: "history",
     blurb: "Assembles a chronological timeline from every dated codex record.",
@@ -531,6 +549,7 @@ console.log(circular(400));`;
   },
   {
     id: "skill-career",
+    kind: "lookup",
     name: "Space Careers Advisor",
     domain: "education",
     blurb: "Which real organisations hire for which skill, and what to learn.",
@@ -551,6 +570,7 @@ console.log(circular(400));`;
   },
   {
     id: "skill-launch-site",
+    kind: "calculate",
     name: "Launch Site Selector",
     domain: "mission design",
     blurb: "Picks the best real spaceport on Earth for a target orbit.",
@@ -578,6 +598,7 @@ console.log(circular(400));`;
   },
   {
     id: "skill-sun-synchronous",
+    kind: "calculate",
     name: "Sun-Synchronous Designer",
     domain: "astrodynamics",
     blurb: "The exact inclination that makes an orbit precess with the seasons.",
@@ -603,6 +624,7 @@ console.log(circular(400));`;
   },
   {
     id: "skill-power-budget",
+    kind: "calculate",
     name: "Spacecraft Power Engineer",
     domain: "engineering",
     blurb: "Solar array sizing, eclipse fraction and battery depth of discharge.",
@@ -628,6 +650,7 @@ console.log(circular(400));`;
   },
   {
     id: "skill-reentry",
+    kind: "calculate",
     name: "Re-entry & Disposal Analyst",
     domain: "space safety",
     blurb: "Decay lifetime, disposal rules and re-entry heating.",
@@ -651,6 +674,7 @@ console.log(circular(400));`;
   },
   {
     id: "skill-thermal",
+    kind: "calculate",
     name: "Thermal Control Engineer",
     domain: "engineering",
     blurb: "Equilibrium temperature of a body at any distance from the Sun.",
@@ -678,6 +702,7 @@ console.log(circular(400));`;
   },
   {
     id: "skill-imagery",
+    kind: "calculate",
     name: "Remote Sensing Analyst",
     domain: "earth observation",
     blurb: "Ground resolution, swath and revisit from orbit and optics.",
@@ -700,6 +725,7 @@ console.log(circular(400));`;
   },
   {
     id: "skill-habitability",
+    kind: "lookup",
     name: "Habitability Assessor",
     domain: "astrobiology",
     blurb: "Whether a world could hold liquid water, and what would kill you first.",
@@ -721,6 +747,7 @@ console.log(circular(400));`;
   },
   {
     id: "skill-quantum",
+    kind: "calculate",
     name: "Quantum Communications Engineer",
     domain: "quantum",
     blurb: "Key rates, loss budgets and why orbit beats fibre for QKD.",
@@ -742,6 +769,7 @@ console.log(circular(400));`;
   },
   {
     id: "skill-observing",
+    kind: "live",
     name: "Night Sky Guide",
     domain: "education",
     blurb: "What is worth looking at tonight, and with what.",
@@ -763,10 +791,15 @@ console.log(circular(400));`;
   },
   {
     id: "skill-philosophy",
+    kind: "reflect",
     name: "MRS THORN BIRD — Reflection",
     domain: "philosophy",
     blurb: "The emotional reading of whatever the mesh just calculated.",
-    keys: ["why", "meaning", "feel", "beautiful", "alone", "soul", "love", "afraid", "hope", "human", "philosophy", "sad"],
+    keys: [
+      "why", "meaning", "feel", "beautiful", "alone", "soul", "love", "afraid", "hope",
+      "human", "philosophy", "sad", "lonely", "wonder", "purpose",
+      "does it matter", "any of this", "the point of", "what is the point", "make me feel",
+    ],
     run(q) {
       const lower = q.toLowerCase();
       const pool = /alone|lonely|empty/.test(lower)
@@ -800,6 +833,7 @@ console.log(circular(400));`;
 
 const knowledgeAgents = CODEX.map((entry) => ({
   id: `know-${entry.id}`,
+  kind: "lookup",
   name: `${entry.name} Specialist`,
   domain: CATEGORIES[entry.cat]?.label || entry.cat,
   blurb: entry.line,
@@ -817,6 +851,7 @@ const knowledgeAgents = CODEX.map((entry) => ({
 
 const industryAgents = COMPANIES.map((c) => ({
   id: `firm-${c.id}`,
+  kind: "lookup",
   name: `${c.name} Desk`,
   domain: `industry · ${c.sector}`,
   blurb: c.focus,
@@ -836,6 +871,7 @@ const industryAgents = COMPANIES.map((c) => ({
 
 const constellationAgents = live.TLE_GROUPS.map((g) => ({
   id: `const-${g.id}`,
+  kind: "live",
   name: `${g.label} Constellation Operator`,
   domain: "live tracking",
   blurb: `Live NORAD elements for the ${g.label.toLowerCase()} group, propagated with SGP4.`,
@@ -878,6 +914,7 @@ const FEED_PHRASES = {
 
 const feedAgents = live.SOURCES.map((s) => ({
   id: `feed-${s.id}`,
+  kind: "live",
   name: `${s.name} Feed`,
   domain: "live data",
   blurb: `Public feed from ${s.host}${s.key ? " (NASA API key)" : " (no key required)"}.`,
@@ -940,6 +977,7 @@ const feedAgents = live.SOURCES.map((s) => ({
 const tutorAgents = Object.values(COURSES).flatMap((course) =>
   course.levels.map((level) => ({
     id: `tutor-${course.id}-${level.n}`,
+  kind: "lookup",
     name: `${course.name} · Level ${level.n} Tutor`,
     domain: `classroom · ${course.subject}`,
     blurb: level.title,
@@ -956,6 +994,7 @@ const tutorAgents = Object.values(COURSES).flatMap((course) =>
 
 const regionAgents = COUNTRIES.map((country) => ({
   id: `region-${country.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+  kind: "lookup",
   name: `${country} Space Sector Desk`,
   domain: "national programmes",
   blurb: `Everything catalogued that is built, launched or operated from ${country}.`,
@@ -973,6 +1012,7 @@ const regionAgents = COUNTRIES.map((country) => ({
 
 const sectorAgents = SECTORS.map((sector) => ({
   id: `sector-${sector.replace(/[^a-z0-9]+/g, "-")}`,
+  kind: "lookup",
   name: `${sector.replace(/\b\w/g, (c) => c.toUpperCase())} Sector Analyst`,
   domain: "industry analysis",
   blurb: `Comparative view of every organisation working in ${sector}.`,
@@ -994,6 +1034,7 @@ const sectorAgents = SECTORS.map((sector) => ({
 
 const spaceportAgents = SPACEPORTS.map((s) => ({
   id: `pad-${s.id}`,
+  kind: "lookup",
   name: `${s.name} Range Control`,
   domain: "launch sites",
   blurb: `${s.operator} · ${s.flies}`,
@@ -1018,6 +1059,7 @@ const spaceportAgents = SPACEPORTS.map((s) => ({
 
 const observatoryAgents = OBSERVATORIES.map((o) => ({
   id: `obs-${o.id}`,
+  kind: "lookup",
   name: `${o.name} Science Desk`,
   domain: "observatories",
   blurb: o.spec,
@@ -1036,6 +1078,7 @@ const observatoryAgents = OBSERVATORIES.map((o) => ({
 
 const groundAgents = GROUND_NETWORKS.map((g) => ({
   id: `gs-${g.id}`,
+  kind: "lookup",
   name: `${g.name}`,
   domain: "ground segment",
   blurb: g.purpose,
@@ -1116,10 +1159,31 @@ const STOP = new Set([
  * Scores every agent against a request and returns the strongest.
  * Exact key phrases beat single word hits, which beat blurb matches.
  */
-export function route(request, { limit = 4 } = {}) {
+/**
+ * How much an agent is rewarded for matching the quantum classifier's
+ * verdict. Applied multiplicatively to the keyword score, and scaled by
+ * the classifier's own confidence, so an uncertain classification barely
+ * moves the ranking and a confident one decides close calls.
+ *
+ * The keyword score still dominates. This breaks ties on the *kind* of
+ * answer wanted — "what would I weigh on Titan" and "tell me about Titan"
+ * hit the same keywords and want completely different agents.
+ */
+const INTENT_BOOST = 1.1;
+
+export function route(request, { limit = 4, intent = null, useQuantum = true } = {}) {
   const lower = request.toLowerCase();
   const terms = words(lower).filter((w) => w.length > 2 && !STOP.has(w));
   if (!terms.length) return [];
+
+  let verdict = intent;
+  if (!verdict && useQuantum) {
+    try {
+      verdict = classify(request);
+    } catch {
+      verdict = null; // routing must never depend on the classifier surviving
+    }
+  }
 
   const scored = AGENTS.map((agent) => {
     let score = 0;
@@ -1137,21 +1201,28 @@ export function route(request, { limit = 4 } = {}) {
       const b = agent.blurb.toLowerCase();
       for (const t of terms) if (b.includes(t)) score += 1;
     }
-    return { agent, score: Math.round(score * (agent.priority || 1)) };
+    let weighted = score * (agent.priority || 1);
+    if (verdict && agent.kind) {
+      const support = verdict.ranked.find((r) => r.intent === agent.kind)?.score ?? 0;
+      // Centre the support on the average, so a matching kind is rewarded
+      // and a mismatched one is mildly penalised rather than eliminated.
+      weighted *= 1 + INTENT_BOOST * verdict.confidence * (support - 1 / verdict.ranked.length);
+    }
+    return { agent, score: Math.round(Math.max(0, weighted)) };
   })
     .filter((r) => r.score > 3)
     .sort((a, b) => b.score - a.score);
 
-  return scored.slice(0, limit).map((r) => ({ ...r.agent, score: r.score }));
+  return scored.slice(0, limit).map((r) => ({ ...r.agent, score: r.score, intent: verdict?.intent || null }));
 }
 
 /**
  * Runs a request across the mesh. Agents run in parallel; a failure in
  * one never takes down the answer, it is reported as a failure.
  */
-export async function dispatch(request, { limit = 3, context = {} } = {}) {
+export async function dispatch(request, { limit = 3, context = {}, intent = null } = {}) {
   const started = performance.now();
-  const chosen = route(request, { limit });
+  const chosen = route(request, { limit, intent });
 
   if (!chosen.length) {
     const guesses = searchCodex(request).slice(0, 5);

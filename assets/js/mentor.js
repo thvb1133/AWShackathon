@@ -11,7 +11,9 @@
    microphone was armed at least once.
    ============================================================ */
 
-import { dispatch, speakable, AGENT_COUNT, MESH_STATS } from "./agents.js";
+import { AGENT_COUNT, MESH_STATS } from "./agents.js";
+import { ask, describeSetup } from "./llm.js";
+import { INTENTS } from "./qml.js";
 import { speak, stopSpeaking, canListen, canSpeak, createVoiceCommander } from "./voice.js";
 import { escapeHtml } from "./ui.js";
 import { getSettings, saveSettings, currentUser } from "./store.js";
@@ -83,7 +85,7 @@ export function mountMentor() {
     chip.type = "button";
     chip.className = "chip";
     chip.textContent = s;
-    chip.addEventListener("click", () => ask(s));
+    chip.addEventListener("click", () => askJarvis(s));
     chips.appendChild(chip);
   }
 
@@ -97,49 +99,52 @@ export function mountMentor() {
     return el;
   }
 
-  function renderResult(result) {
-    const parts = [];
-    for (const r of result.reports) {
-      parts.push(`<div class="agent-report">
-        <strong>${escapeHtml(r.title)}</strong>
-        <div class="muted" style="font-size:.72rem;margin-bottom:.3rem">${escapeHtml(r.agent?.name || "mesh")} · ${escapeHtml(r.agent?.domain || "")}${r.source ? ` · data ${escapeHtml(r.source)}` : ""}</div>
-        <ul>${r.lines.map((l) => `<li>${escapeHtml(l)}</li>`).join("")}</ul>
-        ${r.code ? `<pre class="code"><code>${escapeHtml(r.code)}</code></pre>` : ""}
-      </div>`);
-    }
-    parts.push(
-      `<div class="muted" style="font-size:.7rem">${result.agents.length} agent(s) answered in ${result.ms} ms</div>`
-    );
-    return parts.join("");
+  /** The prose answer, then the agent reports that back it up. */
+  function renderReply(reply) {
+    const intentChip = reply.intent
+      ? `<span class="chip">${INTENTS[reply.intent.intent]?.emoji || ""} ${escapeHtml(INTENTS[reply.intent.intent]?.label || "")} ${(reply.intent.confidence * 100).toFixed(0)}%</span>`
+      : "";
+    const sources = (reply.reports || [])
+      .map((r) => `<li><b>${escapeHtml(r.agent?.name || "mesh")}</b> — ${escapeHtml(r.title)}
+        ${r.source ? `<span class="muted">(data ${escapeHtml(r.source)})</span>` : ""}
+        <ul>${r.lines.slice(0, 4).map((l) => `<li>${escapeHtml(l)}</li>`).join("")}</ul></li>`)
+      .join("");
+
+    return `<div>${escapeHtml(reply.text)}</div>
+      ${reply.code ? `<pre class="code"><code>${escapeHtml(reply.code.code)}</code></pre>` : ""}
+      ${sources ? `<details style="margin-top:.5rem"><summary class="muted" style="font-size:.72rem;cursor:pointer">
+        Show the ${reply.reports.length} agent report(s) behind this</summary>
+        <ul style="font-size:.8rem;padding-left:1rem">${sources}</ul></details>` : ""}
+      <div class="muted" style="font-size:.7rem;margin-top:.35rem">${intentChip}
+        ${escapeHtml(reply.provider || "mesh")} · ${reply.ms} ms</div>`;
   }
 
   let busy = false;
-  async function ask(question) {
+  async function askJarvis(question) {
     const text = (question || "").trim();
     if (!text || busy) return;
     busy = true;
     input.value = "";
     bubble(escapeHtml(text), "user");
-    const thinking = bubble("<em>routing across the mesh…</em>", "penguin");
+    const thinking = bubble("<em>classifying on the quantum circuit…</em>", "penguin");
 
-    const result = await dispatch(text, {
-      limit: 3,
-      context: { user: currentUser()?.username || null },
+    const reply = await ask(text, {
+      onStage: (_stage, message) => { thinking.innerHTML = `<em>${escapeHtml(message)}</em>`; },
     });
     thinking.remove();
-    bubble(renderResult(result), "penguin");
+    bubble(renderReply(reply), "penguin");
 
     const history = loadLog();
-    history.push({ q: text, at: Date.now(), agents: result.agents.map((a) => a.name) });
+    history.push({ q: text, at: Date.now(), intent: reply.intent?.intent, provider: reply.provider });
     saveLog(history);
 
-    if (getSettings().narration) speak(speakable(result), "penguin");
+    if (getSettings().narration) speak(reply.text, "penguin");
     busy = false;
   }
 
   panel.querySelector("#jarvis-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    ask(input.value);
+    askJarvis(input.value);
   });
 
   /* ------------------------------------------------------ opening */
@@ -148,11 +153,13 @@ export function mountMentor() {
     fab.textContent = "✕";
     if (!log.childElementCount) {
       const user = currentUser();
+      const setup = describeSetup();
       bubble(
         `<strong>JARVIS online.</strong><br>${user ? `Good to see you, cadet ${escapeHtml(user.username)}. ` : ""}` +
-          `${AGENT_COUNT} specialist agents are loaded — ${MESH_STATS.knowledge} on the codex, ${MESH_STATS.industry} on the space industry, ` +
-          `${MESH_STATS.constellations} on live satellite groups, ${MESH_STATS.skills} engineering calculators. ` +
-          `Ask in plain language, or say <b>“Jarvis”</b> out loud to summon me.`,
+          `Your words are classified on a quantum circuit, answered by ${AGENT_COUNT} specialist agents, ` +
+          `and phrased by <b>${escapeHtml(setup.provider)}</b>.<br>` +
+          `Ask in plain language, or say <b>“Jarvis”</b> out loud. ` +
+          `<a href="jarvis.html">Open the full orb console →</a>`,
         "thorn"
       );
     }
@@ -192,13 +199,13 @@ export function mountMentor() {
     if (wake) {
       if (!panel.classList.contains("open")) open("voice");
       const request = wake[2];
-      if (request && request.length > 2) ask(request);
+      if (request && request.length > 2) askJarvis(request);
       else if (canSpeak()) speak("Listening.", "penguin");
       return true;
     }
     // With the console already open, speak freely — no wake word needed.
     if (panel.classList.contains("open")) {
-      ask(phrase);
+      askJarvis(phrase);
       return true;
     }
     return false;
@@ -250,5 +257,5 @@ export function mountMentor() {
     }
   });
 
-  return { ask, open, close, toggleMic };
+  return { ask: askJarvis, open, close, toggleMic };
 }

@@ -529,6 +529,117 @@ dialog::backdrop { background: rgba(2, 0, 12, 0.72); backdrop-filter: blur(3px);
 .tick { color: var(--good); }
 .cross { color: var(--bad); }
 .pill-row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+/* ============================================================
+   The JARVIS orb stage
+   ============================================================ */
+.orb-stage {
+  display: grid; grid-template-columns: minmax(280px, 520px) 1fr;
+  gap: 2rem; align-items: center; padding: 1.4rem 0 0.6rem;
+}
+@media (max-width: 900px) { .orb-stage { grid-template-columns: 1fr; } }
+
+.orb-holder { position: relative; aspect-ratio: 1; width: 100%; max-width: 520px; margin: 0 auto; }
+#orb-canvas { display: block; width: 100%; height: 100%; position: relative; z-index: 2; }
+
+/* Two counter-rotating dashed rings, so the orb reads as a 3D object
+   sitting inside something rather than a flat circle. */
+.orb-ring, .orb-ring::before, .orb-ring::after {
+  position: absolute; border-radius: 50%; pointer-events: none;
+}
+.orb-ring {
+  inset: 4%;
+  border: 1px dashed rgba(255, 111, 174, 0.35);
+  transform: rotateX(72deg);
+  animation: orbspin 18s linear infinite;
+}
+.orb-ring::before {
+  content: ""; inset: -9%;
+  border: 1px dashed rgba(79, 215, 255, 0.28);
+  animation: orbspin 27s linear infinite reverse;
+}
+.orb-ring::after {
+  content: ""; inset: 12%;
+  border: 1px solid rgba(155, 107, 255, 0.22);
+  animation: orbspin 12s linear infinite;
+}
+@keyframes orbspin { to { transform: rotateX(72deg) rotate(360deg); } }
+
+.orb-side h1 { font-size: clamp(2.4rem, 6vw, 4rem); letter-spacing: 0.04em; }
+
+.chip-live {
+  background: linear-gradient(135deg, var(--thorn), var(--violet));
+  color: #fff; border-color: transparent;
+  box-shadow: 0 0 18px rgba(255, 111, 174, 0.55);
+}
+.chip-off { opacity: 0.45; }
+
+/* ============================================================
+   Depth: give the flat panels a sense of being lit and raised
+   ============================================================ */
+.card {
+  position: relative;
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 42%),
+    var(--panel);
+  box-shadow:
+    var(--shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 0.25s, border-color 0.25s;
+}
+a.card:hover, .codex-card:hover {
+  transform: translateY(-4px) scale(1.008);
+  border-color: rgba(255, 111, 174, 0.5);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 34px rgba(155, 107, 255, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+.metric {
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 45%),
+    var(--panel);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 26px rgba(0, 0, 0, 0.4);
+}
+.btn {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+.btn.primary, .btn.ice {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 8px 22px rgba(155, 107, 255, 0.4);
+}
+h1 { text-shadow: 0 0 38px rgba(155, 107, 255, 0.35); }
+.gradient-text {
+  background: linear-gradient(100deg, var(--thorn), var(--gold) 40%, var(--penguin) 78%, var(--violet));
+  background-size: 220% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: sheen 9s ease-in-out infinite;
+}
+@keyframes sheen { 50% { background-position: 100% 0; } }
+
+/* ============================================================
+   Quantum page
+   ============================================================ */
+.qubit-grid { display: grid; gap: 0.9rem; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.bloch { position: relative; aspect-ratio: 1; }
+.bloch canvas { width: 100%; height: 100%; display: block; }
+.amp-bars { display: flex; gap: 3px; align-items: flex-end; height: 130px; }
+.amp-bars > div {
+  flex: 1; min-width: 4px; border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, var(--thorn), var(--violet));
+  transition: height 0.25s;
+}
+.circuit {
+  font-family: "Cascadia Code", Consolas, monospace; font-size: 0.74rem; line-height: 1.9;
+  white-space: pre; overflow-x: auto; color: var(--penguin-soft);
+  background: #05030f; border: 1px solid var(--line); border-radius: 12px; padding: 0.8rem;
+}
+.loss-chart { width: 100%; height: 180px; display: block; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.8rem; font-size: 0.86rem; }
+.kv dt { color: var(--ink-faint); }
+.kv dd { margin: 0; font-weight: 600; }
+.bitstream {
+  font-family: "Cascadia Code", Consolas, monospace; font-size: 0.7rem;
+  word-break: break-all; color: var(--penguin-soft); line-height: 1.5;
+}
 .mono { font-family: "Cascadia Code", Consolas, monospace; font-size: 0.82rem; }
 .scroll-x { overflow-x: auto; }
 .center { text-align: center; }

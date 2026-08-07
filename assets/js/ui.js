@@ -11,12 +11,14 @@ import { speak, stopSpeaking, canSpeak, canListen, createVoiceCommander } from "
 
 export const NAV = [
   { href: "index.html", label: "Home", icon: "🏠" },
+  { href: "jarvis.html", label: "JARVIS", icon: "🔮" },
   { href: "classroom.html", label: "Classroom", icon: "🪐" },
   { href: "cosmos.html", label: "Live Cosmos", icon: "🌍" },
   { href: "orbitlab.html", label: "Orbit Lab", icon: "🛰️" },
   { href: "codex.html", label: "Codex", icon: "📚" },
   { href: "mission-control.html", label: "Mission Control", icon: "📡" },
   { href: "agents.html", label: "Agent Mesh", icon: "🤖" },
+  { href: "quantum.html", label: "Quantum Core", icon: "⚛️" },
   { href: "quiz.html", label: "Quiz", icon: "📝" },
   { href: "rankings.html", label: "Rankings", icon: "📊" },
   { href: "about.html", label: "About", icon: "📖" },
@@ -306,6 +308,9 @@ export function initShell(activePage) {
   buildFooter();
   if (!canSpeak()) console.info("Speech synthesis unavailable in this browser.");
   import("./mentor.js").then((m) => m.mountMentor()).catch(() => {});
+  // Train the quantum classifier off the critical path, so a first visit
+  // never waits on it. Cached weights make every later visit instant.
+  import("./qml.js").then((m) => m.warmUp()).catch(() => {});
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
     navigator.serviceWorker.register("sw.js").catch(() => {});
   }

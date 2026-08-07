@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quantum Core · Beyond Orbit</title>
+<meta name="description" content="The quantum machine learning that routes this application, and the BB84 key exchange that encrypts its credentials — both running live in your browser.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚛️</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <div class="wrap">
+    <h1 class="gradient-text">⚛️ The Quantum Core</h1>
+    <p class="muted">This page is the honest one. Everything below is a real quantum algorithm executed on a
+       state-vector simulator that lives in <span class="mono">assets/js/quantum.js</span> — real gates, real
+       amplitudes, real parameter-shift gradients, the real BB84 protocol. There is no quantum processor in a web
+       browser, so a 4-qubit register is simply simulated exactly. On hardware the mathematics would be identical;
+       you would get shot noise and decoherence thrown in.</p>
+
+    <section class="card" id="selfcheck-card">
+      <h2>✅ Simulator self-check</h2>
+      <p class="muted">Run before anything else trusts it.</p>
+      <div id="selfcheck"></div>
+    </section>
+
+    <section class="card mt">
+      <h2>🧠 The classifier that routes this application</h2>
+      <p>Every request you type or speak is first classified into one of five intents by <b>two independent quantum
+         models</b>. Where they agree, the mesh commits to a few specialists. Where they disagree, confidence drops and
+         the search widens. This is not a demonstration bolted on the side — switch it off and the router gets worse.</p>
+      <div class="grid three mt" id="model-facts"></div>
+
+      <div class="split mt">
+        <div>
+          <h3>Training, live</h3>
+          <p class="muted">Five one-vs-rest variational circuits, trained by the parameter-shift rule — the same way
+             gradients are obtained on real hardware, because you cannot backpropagate through a physical device.</p>
+          <canvas class="loss-chart" id="loss-chart"></canvas>
+          <p class="lesson-actions">
+            <button class="btn primary small" id="btn-train">Retrain from scratch</button>
+            <button class="btn ghost small" id="btn-clear-weights">Clear cached weights</button>
+          </p>
+          <p class="hint" id="train-status"></p>
+        </div>
+        <div>
+          <h3>Accuracy per intent</h3>
+          <table id="accuracy-table"><thead><tr><th>Intent</th><th>Training accuracy</th></tr></thead><tbody></tbody></table>
+          <h3 class="mt">The ansatz</h3>
+          <p class="muted" style="font-size:.84rem">Hardware-efficient: RY and RZ on every qubit, then a ring of CNOTs.
+             Chosen because it needs only nearest-neighbour coupling, which is what superconducting devices actually have.</p>
+          <div class="circuit" id="circuit-diagram"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card mt">
+      <h2>🔬 Encode a sentence into a quantum state</h2>
+      <p class="muted">Type anything. It is turned into four bounded features, each becomes a rotation angle, and the
+         resulting 16-amplitude state is shown exactly as the simulator holds it.</p>
+      <div class="codex-toolbar">
+        <div class="field"><label for="probe">Your sentence</label>
+          <input id="probe" value="where is the space station right now" autocomplete="off"></div>
+        <button class="btn small" id="btn-probe">Encode &amp; classify</button>
+      </div>
+      <div class="split mt">
+        <div>
+          <h3>State amplitudes — |ψ|² over 16 basis states</h3>
+          <div class="amp-bars" id="amp-bars"></div>
+          <p class="hint" id="amp-note"></p>
+        </div>
+        <div>
+          <h3>Result</h3>
+          <div id="probe-result"></div>
+        </div>
+      </div>
+      <h3 class="mt">Bloch vectors of the four qubits</h3>
+      <div class="qubit-grid" id="bloch-grid"></div>
+    </section>
+
+    <section class="card mt">
+      <h2>🔐 BB84 quantum key distribution</h2>
+      <p>Bennett and Brassard, 1984 — the protocol the Micius satellite flew in 2016. Alice encodes each bit in a
+         randomly chosen basis, Bob measures in his own. Where the bases match, the bits match, and those positions
+         become the key.</p>
+      <p><b>The security is physical, not mathematical.</b> An eavesdropper must guess a basis too, and every wrong
+         guess randomises the qubit she forwards. Switch Eve on below and watch the error rate jump to about 25% —
+         she cannot hide, because measurement changes what it measures.</p>
+      <p class="muted">Every qubit in this exchange is genuinely prepared, rotated and measured on the simulator. The
+         key that comes out is used for something real: it encrypts your LLM API key at rest on the JARVIS page.</p>
+
+      <div class="codex-toolbar mt">
+        <div class="field" style="flex:0 0 150px"><label for="qkd-bits">Qubits sent</label>
+          <select id="qkd-bits"><option>256</option><option selected>1024</option><option>4096</option></select></div>
+        <div class="field" style="flex:0 0 190px"><label for="qkd-noise">Channel noise</label>
+          <select id="qkd-noise">
+            <option value="0" selected>Perfect channel</option>
+            <option value="0.03">3% depolarising</option>
+            <option value="0.1">10% depolarising</option>
+            <option value="0.25">25% depolarising</option>
+          </select></div>
+        <div class="field" style="flex:0 0 auto"><label><input type="checkbox" id="qkd-eve" style="width:auto"> Eve is listening</label></div>
+        <button class="btn primary small" id="btn-qkd">Run the exchange</button>
+      </div>
+      <div class="split mt">
+        <div id="qkd-result"></div>
+        <div>
+          <h3>First sifted bits</h3>
+          <div class="scroll-x"><table id="qkd-trace">
+            <thead><tr><th>#</th><th>Alice</th><th>Basis</th><th>Bob</th><th></th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card mt">
+      <h2>🔎 Grover's search</h2>
+      <p class="muted">Included because it is the clearest proof that these are real amplitudes: the marked item's
+         probability genuinely grows with each iteration, in about √N steps instead of N.</p>
+      <div class="codex-toolbar">
+        <div class="field" style="flex:0 0 150px"><label for="grover-n">Qubits</label>
+          <select id="grover-n"><option>3</option><option selected>5</option><option>7</option><option>9</option></select></div>
+        <button class="btn small" id="btn-grover">Search</button>
+      </div>
+      <div id="grover-result" class="mt"></div>
+    </section>
+
+    <section class="card mt">
+      <h2>🤝 Entanglement</h2>
+      <p class="muted">A Hadamard and a CNOT make a Bell pair. Measure one qubit and the other is decided instantly,
+         every single time — which is the correlation the whole of quantum key distribution rests on.</p>
+      <p class="lesson-actions"><button class="btn small" id="btn-bell">Measure 500 Bell pairs</button></p>
+      <div id="bell-result"></div>
+    </section>
+
+    <section class="card mt">
+      <h2>What this is, and what it is not</h2>
+      <ul>
+        <li><b>It is</b> the genuine algorithms: state-vector simulation with exact unitary gates, the ZZ feature map of
+            Havlíček et al. (2019), quantum kernel estimation by the overlap trick, parameter-shift gradients, BB84 with
+            sifting and an abort threshold, and Grover amplitude amplification.</li>
+        <li><b>It is not</b> a quantum processor. Nothing in a browser can be. A simulated key exchange also cannot give
+            physical secrecy, because Alice and Bob are the same computer — so the key here is used for obfuscation at
+            rest, and this page says so rather than pretending otherwise.</li>
+        <li><b>Why bother, then?</b> Because the routing genuinely runs on it, the mathematics is genuinely correct, and
+            a claim you can inspect is worth more than one you cannot.</li>
+      </ul>
+    </section>
+  </div>
+</main>
+<script type="module" src="assets/js/page-quantum.js"></script>
+</body>
+</html>
