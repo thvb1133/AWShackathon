@@ -373,26 +373,34 @@ export const upcomingLaunches = (limit = 12) =>
     const raw = await grab(
       `https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=${limit}&mode=list`
     );
+    // In list mode the fields are flattened: lsp_name and pad are strings,
+    // not the nested objects the detail mode returns.
     return (raw.results || []).map((l) => ({
       name: l.name,
       net: l.net,
-      provider: l.launch_service_provider?.name || "—",
-      pad: l.pad?.location?.name || l.pad?.name || "—",
-      status: l.status?.abbrev || "TBD",
+      provider: l.lsp_name || l.launch_service_provider?.name || "—",
+      pad: [l.pad, l.location].filter(Boolean).join(", ") || l.pad?.location?.name || "—",
+      mission: l.mission || l.mission_type || "",
+      status: l.status?.abbrev || l.status?.name || "TBD",
     }));
   });
+
+/* NOAA's summary products come back as a one-element array of objects.
+   Their key names differ per product, so each is read explicitly. */
+const firstRow = (raw) => (Array.isArray(raw) ? raw[0] : raw) || {};
 
 /** Solar-wind conditions straight from NOAA's space weather service. */
 export const solarWind = () =>
   feed("solarwind", 30 * MIN, async () => {
-    const raw = await grab("https://services.swpc.noaa.gov/products/summary/solar-wind-speed.json");
-    const mag = await grab("https://services.swpc.noaa.gov/products/summary/solar-wind-mag-field.json").catch(() => null);
+    const speed = firstRow(await grab("https://services.swpc.noaa.gov/products/summary/solar-wind-speed.json"));
+    const mag = firstRow(
+      await grab("https://services.swpc.noaa.gov/products/summary/solar-wind-mag-field.json").catch(() => null)
+    );
     return {
-      speedKms: Number(raw.WindSpeed),
-      density: Number(raw.WindDensity ?? NaN),
-      bz: mag ? Number(mag.Bz) : NaN,
-      bt: mag ? Number(mag.Bt) : NaN,
-      time: raw.TimeStamp,
+      speedKms: Number(speed.proton_speed ?? speed.WindSpeed ?? NaN),
+      bz: Number(mag.bz_gsm ?? mag.Bz ?? NaN),
+      bt: Number(mag.bt ?? mag.Bt ?? NaN),
+      time: speed.time_tag || mag.time_tag || null,
     };
   });
 
@@ -400,9 +408,16 @@ export const solarWind = () =>
 export const geomagneticIndex = () =>
   feed("kindex", 30 * MIN, async () => {
     const raw = await grab("https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json");
-    const rows = raw.slice(1);
-    const last = rows[rows.length - 1];
-    return { kp: Number(last[1]), time: last[0], history: rows.slice(-24).map((r) => Number(r[1])) };
+    if (!Array.isArray(raw) || !raw.length) throw new Error("Unexpected K-index payload");
+    // Older revisions of this product were a CSV-style array of arrays; the
+    // current one is an array of objects. Both are accepted.
+    const rows = Array.isArray(raw[0])
+      ? raw.slice(1).map((r) => ({ time: r[0], kp: Number(r[1]) }))
+      : raw.map((r) => ({ time: r.time_tag, kp: Number(r.Kp ?? r.kp_index ?? r.kp) }));
+    const usable = rows.filter((r) => Number.isFinite(r.kp));
+    if (!usable.length) throw new Error("No usable K-index readings");
+    const last = usable[usable.length - 1];
+    return { kp: last.kp, time: last.time, history: usable.slice(-24).map((r) => r.kp) };
   });
 
 /* ============================================================

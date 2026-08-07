@@ -298,7 +298,11 @@ const SKILLS = [
     name: "Flight Software Author",
     domain: "engineering",
     blurb: "Writes runnable Python or JavaScript for the task you describe.",
-    keys: ["code", "python", "javascript", "script", "program", "write me", "function", "api", "sgp4", "how do i compute", "snippet"],
+    keys: [
+      "code", "python", "javascript", "script", "program", "function", "snippet",
+      "python code", "javascript code", "code to", "code for", "write code", "write me",
+      "script to", "sample code", "show me code", "how do i compute", "sgp4",
+    ],
     run(q) {
       const lower = q.toLowerCase();
       const python = !lower.includes("javascript") && !lower.includes("js ");
@@ -423,6 +427,11 @@ console.log(circular(400));`;
       }
       return report(`${python ? "Python" : "JavaScript"} — ${what}`, [
         "This runs as written. No credentials beyond NASA's public DEMO_KEY are required.",
+        python
+          ? "Install the dependencies shown in the first comment line, then run the file directly."
+          : "Paste it into a module script or a Node file with top-level await enabled.",
+        "Ask again mentioning “javascript” or “python” to get the other language, and name a subject — satellites, NASA data, delta-v or orbits — to change what it computes.",
+        "The same mathematics is what drives the 3D pages of this app, so you can check the output against them.",
       ], { code: snippet, language: python ? "python" : "javascript" });
     },
   },
@@ -480,7 +489,10 @@ console.log(circular(400));`;
     name: "Surface Conditions Analyst",
     domain: "planetary science",
     blurb: "Gravity, weight and escape velocity on any world in the codex.",
-    keys: ["gravity", "weigh", "weight", "jump", "surface", "escape velocity", "heavy", "stand on"],
+    keys: [
+      "gravity", "weigh", "weight", "jump", "surface", "heavy",
+      "escape velocity", "surface gravity", "weigh on", "stand on", "jump on", "would i weigh",
+    ],
     run(q) {
       const lower = q.toLowerCase();
       const relative = {
@@ -808,7 +820,9 @@ const industryAgents = COMPANIES.map((c) => ({
   name: `${c.name} Desk`,
   domain: `industry · ${c.sector}`,
   blurb: c.focus,
-  keys: [c.name.toLowerCase(), c.id, c.sector, c.country.toLowerCase(), ...words(c.focus).filter((w) => w.length > 4)],
+  // Countries are written "Finland/USA" and "France/Germany", so the string
+  // is split as well as kept whole — otherwise "in Finland" reaches nobody.
+  keys: [c.name.toLowerCase(), c.id, c.sector, ...words(c.sector), c.country.toLowerCase(), ...words(c.country), ...words(c.focus)],
   run() {
     const peers = companiesBySector(c.sector).filter((p) => p.id !== c.id).slice(0, 4);
     return report(`🏭 ${c.name}`, [
@@ -848,33 +862,78 @@ const constellationAgents = live.TLE_GROUPS.map((g) => ({
   },
 }));
 
+/* Phrases people actually type, mapped to the feed that answers them. */
+const FEED_PHRASES = {
+  apod: ["picture of the day", "apod", "astronomy picture", "image of the day"],
+  neo: ["near earth object", "asteroid passing", "asteroids near earth", "close asteroid"],
+  donki: ["space weather", "solar flare", "coronal mass ejection", "geomagnetic storm"],
+  epic: ["whole earth", "earth from space", "dscovr", "earth photo"],
+  cad: ["close approach", "closest approach"],
+  fireball: ["fireball", "meteor impact", "bolide"],
+  tle: ["element set", "two line element", "orbital elements"],
+  iss: ["where is the iss", "iss position", "space station position"],
+  launch: ["next launch", "launch schedule", "upcoming launch", "launches worldwide", "who is launching"],
+  swpc: ["solar wind", "k index", "kp index", "aurora forecast"],
+};
+
 const feedAgents = live.SOURCES.map((s) => ({
   id: `feed-${s.id}`,
   name: `${s.name} Feed`,
   domain: "live data",
   blurb: `Public feed from ${s.host}${s.key ? " (NASA API key)" : " (no key required)"}.`,
-  keys: [s.id, ...words(s.name), s.host, "live", "data", "now", "today"],
+  keys: [s.id, ...words(s.name), s.host, ...(FEED_PHRASES[s.id] || []), "live", "data", "today"],
   async run() {
     const res = await s.run();
     if (!res.ok) return report(s.name, [`Unavailable: ${res.error || "no response"}.`]);
     const d = res.data;
     const lines = [`Source: ${s.host} · delivered ${res.source}.`];
+
+    /* Raw API field names read badly out loud and worse on screen, so each
+       value is given a human label and a sensible number of digits. */
+    const LABELS = {
+      lat: ["Latitude", (v) => `${fmt(v, 3)}°`],
+      lon: ["Longitude", (v) => `${fmt(v, 3)}°`],
+      altKm: ["Altitude", (v) => `${fmt(v, 1)} km`],
+      speedKmh: ["Ground speed", (v) => `${fmt(v, 0)} km/h`],
+      speedKms: ["Speed", (v) => `${fmt(v, 3)} km/s`],
+      visibility: ["Sunlight", (v) => String(v)],
+      timestamp: ["Measured at", (v) => new Date(v).toUTCString().slice(5, 25)],
+      kp: ["Planetary K-index", (v) => fmt(v, 2)],
+      bz: ["Interplanetary field Bz", (v) => `${fmt(v, 1)} nT`],
+      bt: ["Interplanetary field Bt", (v) => `${fmt(v, 1)} nT`],
+      title: ["Title", (v) => String(v)],
+      date: ["Date", (v) => String(v).slice(0, 16)],
+      explanation: ["Explanation", (v) => `${String(v).slice(0, 260)}…`],
+      url: ["Link", (v) => String(v)],
+      name: ["Name", (v) => String(v)],
+      provider: ["Provider", (v) => String(v)],
+      net: ["Scheduled for", (v) => new Date(v).toUTCString().slice(0, 22)],
+      pad: ["Pad", (v) => String(v)],
+      missLunar: ["Miss distance", (v) => `${v} lunar distances`],
+      diameterM: ["Diameter", (v) => `~${fmt(v, 0)} m`],
+      distAu: ["Distance", (v) => `${fmt(v, 5)} AU`],
+      energyKt: ["Impact energy", (v) => `${fmt(v, 2)} kt TNT`],
+    };
+    const describe = (row) =>
+      Object.entries(row)
+        .filter(([k, v]) => LABELS[k] && v !== null && v !== undefined && v !== "")
+        .slice(0, 6)
+        .map(([k, v]) => `${LABELS[k][0]}: ${LABELS[k][1](v)}`)
+        .join(" · ");
+
     if (Array.isArray(d)) {
       lines.push(`${d.length} record(s).`);
       for (const row of d.slice(0, 6)) {
-        lines.push(
-          typeof row === "string"
-            ? row
-            : Object.entries(row).slice(0, 4).map(([k, v]) => `${k}: ${typeof v === "number" ? fmt(v) : String(v).slice(0, 60)}`).join(" · ")
-        );
+        lines.push(typeof row === "string" ? row : describe(row) || JSON.stringify(row).slice(0, 120));
       }
     } else if (d && typeof d === "object") {
-      for (const [k, v] of Object.entries(d).slice(0, 8)) {
-        if (typeof v === "object") continue;
-        lines.push(`${k}: ${String(v).slice(0, 160)}`);
+      for (const [k, v] of Object.entries(d)) {
+        if (v === null || v === undefined || typeof v === "object") continue;
+        const label = LABELS[k];
+        lines.push(label ? `${label[0]}: ${label[1](v)}` : null);
       }
     }
-    return report(s.name, lines, { source: res.source, raw: d });
+    return report(s.name, lines.filter(Boolean), { source: res.source, raw: d });
   },
 }));
 
@@ -995,19 +1054,49 @@ const groundAgents = GROUND_NETWORKS.map((g) => ({
    3. THE MESH
    ================================================================== */
 
+/* Skill agents are hand-built specialists that compute an answer, so when
+   they match a request at all they should generally beat a catalogue entry
+   that merely shares a word with it. "What would I weigh on Titan" wants
+   the gravity calculator, not the encyclopedia article about Titan. */
+const SKILL_PRIORITY = 1.6;
+
+/* Generated keys come from names and descriptions, which are full of words
+   that carry no routing signal. Left in, "next launches worldwide" reaches
+   the Iridium NEXT operator and "space weather" reaches every company with
+   "Space" in its name. Hand-written skill keys are never filtered. */
+const KEY_NOISE = new Set([
+  "next", "new", "one", "all", "global", "worldwide", "international", "national",
+  "space", "spaceflight", "aerospace", "astro", "system", "systems", "group", "groups",
+  "technology", "technologies", "industries", "industry", "corporation", "company",
+  "labs", "laboratory", "limited", "inc", "ltd", "centre", "center", "station",
+  "science", "sciences", "services", "solutions", "orbit", "orbital", "star", "stars",
+  "first", "largest", "world", "used", "using", "known", "made", "into", "over",
+  "their", "which", "where", "there", "than", "that", "this", "with", "from", "some",
+  "more", "most", "very", "also", "been", "were", "will", "would", "could", "about",
+]);
+
+const cleanGeneratedKeys = (agent) => ({
+  ...agent,
+  keys: [...new Set(agent.keys.filter(Boolean).map((k) => k.toLowerCase()))].filter(
+    (k) => k.includes(" ") || (k.length > 3 && !KEY_NOISE.has(k))
+  ),
+});
+
 export const AGENTS = [
-  ...SKILLS,
-  ...knowledgeAgents,
-  ...industryAgents,
-  ...constellationAgents,
-  ...feedAgents,
-  ...tutorAgents,
-  ...regionAgents,
-  ...sectorAgents,
-  ...spaceportAgents,
-  ...observatoryAgents,
-  ...groundAgents,
-].map((a) => ({ ...a, keys: [...new Set(a.keys.filter(Boolean))] }));
+  ...SKILLS.map((s) => ({ ...s, priority: SKILL_PRIORITY, keys: [...new Set(s.keys)] })),
+  ...[
+    ...knowledgeAgents,
+    ...industryAgents,
+    ...constellationAgents,
+    ...feedAgents,
+    ...tutorAgents,
+    ...regionAgents,
+    ...sectorAgents,
+    ...spaceportAgents,
+    ...observatoryAgents,
+    ...groundAgents,
+  ].map(cleanGeneratedKeys),
+];
 
 export const AGENT_COUNT = AGENTS.length;
 
@@ -1038,7 +1127,9 @@ export function route(request, { limit = 4 } = {}) {
       if (key.includes(" ")) {
         if (lower.includes(key)) score += 14;
       } else if (terms.includes(key)) score += 6;
-      else if (terms.some((t) => t.length > 4 && key.startsWith(t))) score += 2;
+      // Tolerate plurals and simple endings in both directions: a request for
+      // "launches" should still reach an agent keyed on "launch".
+      else if (terms.some((t) => t.length > 4 && (key.startsWith(t) || t.startsWith(key)))) score += 2;
     }
     const nameWords = words(agent.name.toLowerCase());
     for (const t of terms) if (nameWords.includes(t)) score += 5;
@@ -1046,7 +1137,7 @@ export function route(request, { limit = 4 } = {}) {
       const b = agent.blurb.toLowerCase();
       for (const t of terms) if (b.includes(t)) score += 1;
     }
-    return { agent, score };
+    return { agent, score: Math.round(score * (agent.priority || 1)) };
   })
     .filter((r) => r.score > 3)
     .sort((a, b) => b.score - a.score);

@@ -320,8 +320,8 @@ tr.me { background: rgba(255, 209, 102, 0.12); }
 
 /* Cosmos (3D) page ------------------------------------------ */
 .cosmos-shell { position: relative; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow); }
-#solar-canvas { display: block; width: 100%; height: min(70vh, 680px); background: #01000a; cursor: grab; }
-#solar-canvas:active { cursor: grabbing; }
+#solar-canvas, #orbit-canvas { display: block; width: 100%; height: min(70vh, 680px); background: #01000a; cursor: grab; }
+#solar-canvas:active, #orbit-canvas:active { cursor: grabbing; }
 .hud {
   position: absolute; left: 12px; top: 12px; z-index: 3;
   background: rgba(8, 4, 24, 0.78); border: 1px solid var(--line);

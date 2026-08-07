@@ -131,6 +131,13 @@ document.getElementById("btn-now").addEventListener("click", () => {
 });
 document.getElementById("speed-select").addEventListener("change", (e) => sky.setSpeed(parseFloat(e.target.value)));
 
+/* The slider is measured in years either side of page load, so its bounds
+   have to be derived rather than hard-coded, or the reachable range would
+   drift by a year every January. */
+const nowYear = new Date().getUTCFullYear();
+slider.min = String(1600 - nowYear);
+slider.max = String(2200 - nowYear);
+
 slider.addEventListener("pointerdown", () => (sliderHeld = true));
 slider.addEventListener("pointerup", () => (sliderHeld = false));
 slider.addEventListener("input", (e) => {

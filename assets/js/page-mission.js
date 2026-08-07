@@ -94,12 +94,12 @@ async function loadMetrics() {
   if (iss.ok) push("ISS ground position", `${iss.data.lat.toFixed(2)}°, ${iss.data.lon.toFixed(2)}°`, `${Math.round(iss.data.altKm)} km · ${Math.round(iss.data.speedKmh).toLocaleString()} km/h · ${iss.data.visibility}`, iss.source);
 
   const wind = await solarWind();
-  if (wind.ok) push("Solar wind", `${fmt(wind.data.speedKms, 0)} km/s`, `Bz ${fmt(wind.data.bz, 1)} nT · density ${fmt(wind.data.density, 1)} p/cm³`, wind.source);
+  if (wind.ok) push("Solar wind", `${fmt(wind.data.speedKms, 0)} km/s`, `Bt ${fmt(wind.data.bt, 1)} nT · Bz ${fmt(wind.data.bz, 1)} nT`, wind.source);
 
   const kp = await geomagneticIndex();
   if (kp.ok) {
     const level = kp.data.kp >= 7 ? "severe storm — aurora far from the poles" : kp.data.kp >= 5 ? "geomagnetic storm" : kp.data.kp >= 4 ? "unsettled" : "quiet";
-    push("Planetary K-index", `Kp ${kp.data.kp}`, level, kp.source);
+    push("Planetary K-index", `Kp ${fmt(kp.data.kp, 2)}`, level, kp.source);
   }
 
   if (!cards.length) row.innerHTML = `<div class="metric"><div class="label">Offline</div><div class="value">—</div><div class="muted" style="font-size:.76rem">No live feed reachable right now.</div></div>`;
@@ -128,7 +128,7 @@ async function loadWeather() {
   const [wind, kp, donki] = await Promise.all([solarWind(), geomagneticIndex(), spaceWeather(5)]);
   const bits = [`<h2>☀️ Space weather</h2>`];
   if (wind.ok) {
-    bits.push(`<p><b>Solar wind:</b> ${fmt(wind.data.speedKms, 0)} km/s, Bz ${fmt(wind.data.bz, 1)} nT ${tagFor(wind.source)}<br>
+    bits.push(`<p><b>Solar wind:</b> ${fmt(wind.data.speedKms, 0)} km/s, Bt ${fmt(wind.data.bt, 1)} nT, Bz ${fmt(wind.data.bz, 1)} nT ${tagFor(wind.source)}<br>
       <span class="muted">A southward Bz below −10 nT is what opens Earth's magnetic field and lights the aurora.</span></p>`);
   }
   if (kp.ok) {
@@ -178,7 +178,7 @@ async function loadLaunches() {
       const when = new Date(l.net);
       const hrs = (when - Date.now()) / 3600000;
       return `<li><b>${escapeHtml(l.name)}</b><br>
-        <span class="muted">${escapeHtml(l.provider)} · ${escapeHtml(l.pad)}<br>
+        <span class="muted">${escapeHtml(l.provider)}${l.mission ? ` · ${escapeHtml(l.mission)}` : ""}<br>${escapeHtml(l.pad)}<br>
         ${when.toUTCString().slice(0, 22)} UTC · ${hrs > 0 ? `T−${hrs < 48 ? `${hrs.toFixed(1)} h` : `${(hrs / 24).toFixed(1)} days`}` : "past due"} · ${escapeHtml(l.status)}</span></li>`;
     }).join("")}</ul>`;
 }

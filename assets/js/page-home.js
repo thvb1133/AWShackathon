@@ -87,7 +87,7 @@ const tag = (source) => {
   const kp = await geomagneticIndex();
   if (kp.ok) {
     const level = kp.data.kp >= 7 ? "severe storm" : kp.data.kp >= 5 ? "geomagnetic storm" : kp.data.kp >= 4 ? "unsettled" : "quiet";
-    card("Geomagnetic activity", `Kp ${kp.data.kp}`, `Earth's field is ${level}`, tag(kp.source));
+    card("Geomagnetic activity", `Kp ${kp.data.kp.toFixed(2)}`, `Earth's field is ${level}`, tag(kp.source));
   }
 
   const launches = await upcomingLaunches(4);

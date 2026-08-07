@@ -28,7 +28,7 @@ const RAW = [
   ["Spire Global", "USA", "earth observation", 2012, "Radio-occultation weather, ship and aircraft tracking from a cubesat constellation"],
   ["BlackSky", "USA", "earth observation", 2014, "High-revisit imaging and geospatial analytics"],
   ["Capella Space", "USA", "earth observation", 2016, "Synthetic aperture radar imaging through cloud and darkness"],
-  ["ICEYE", "Finland/USA", "earth observation", 2014, "SAR microsatellite constellation for flood and disaster monitoring"],
+  ["ICEYE", "Finland/USA", "earth observation", 2014, "Synthetic aperture radar (SAR) microsatellite constellation for flood and disaster monitoring through cloud and darkness"],
   ["Astrobotic", "USA", "lunar", 2007, "Peregrine and Griffin lunar landers, CubeRover"],
   ["Intuitive Machines", "USA", "lunar", 2013, "Nova-C lunar landers — first commercial soft landing on the Moon"],
   ["Axiom Space", "USA", "stations", 2016, "Private astronaut missions and the first commercial space station modules"],
