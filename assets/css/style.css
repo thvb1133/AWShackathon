@@ -55,6 +55,10 @@ html[data-readable="on"] body {
 
 * { box-sizing: border-box; }
 
+/* .btn sets display:inline-flex, which otherwise beats the user-agent
+   rule for [hidden] and leaves "show more" buttons stuck on screen. */
+[hidden] { display: none !important; }
+
 html { scroll-behavior: smooth; }
 
 body {
@@ -167,6 +171,14 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.25; margin: 0 0 0.
 h1 { font-size: clamp(1.9rem, 4.4vw, 3rem); }
 h2 { font-size: clamp(1.4rem, 2.8vw, 2rem); }
 .muted { color: var(--ink-faint); }
+
+/* The browser's default link blue is unreadable on this background. */
+a { color: var(--penguin-soft); text-decoration-color: rgba(79, 215, 255, 0.5); }
+a:hover { color: #fff; }
+a.btn, a.chip, .codex-card, .nav-links a, .brand { text-decoration: none; }
+a.chip { color: var(--ink-dim); }
+a.chip:hover { color: #fff; background: rgba(155, 107, 255, 0.34); }
+html[data-theme="contrast"] a { color: #9ce7ff; }
 .poetic { font-family: var(--font-display); font-style: italic; color: var(--thorn-soft); }
 .gradient-text {
   background: linear-gradient(100deg, var(--thorn), var(--gold) 45%, var(--penguin));

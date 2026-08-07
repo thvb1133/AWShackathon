@@ -20,6 +20,7 @@ export const COURSES = {
     levels: [
       {
         n: 1,
+        related: ["iss", "moon", "cubesat", "meteoroids"],
         icon: "🌍",
         title: "Just Beyond Earth — Near Space",
         intro: "The first step outside the cradle. Near space is where our atmosphere thins into silence and our machines begin to circle.",
@@ -40,6 +41,7 @@ export const COURSES = {
       },
       {
         n: 2,
+        related: ["sun", "earth", "jupiter", "saturn", "pluto", "kuiper-belt", "oort-cloud", "halley"],
         icon: "☀️",
         title: "The Solar System",
         intro: "One ordinary yellow star and the family of worlds that never learned to let go of it.",
@@ -63,6 +65,7 @@ export const COURSES = {
       },
       {
         n: 3,
+        related: ["orion-nebula", "crab-nebula", "pillars", "supernova"],
         icon: "🌫️",
         title: "The Interstellar Medium",
         intro: "The space between stars is not empty. It is a nursery, and a graveyard, and a fog of memory.",
@@ -81,6 +84,7 @@ export const COURSES = {
       },
       {
         n: 4,
+        related: ["milky-way", "sagittarius-a", "dark-matter", "black-hole"],
         icon: "🌌",
         title: "The Milky Way Galaxy",
         intro: "A spiral of about 400 billion suns, turning once every 230 million years. We have never seen it from the outside.",
@@ -100,6 +104,7 @@ export const COURSES = {
       },
       {
         n: 5,
+        related: ["andromeda", "laniakea", "hubble-man", "m87"],
         icon: "🌠",
         title: "Beyond Our Galaxy",
         intro: "Zoom out until the Milky Way is a single glowing speck. Now keep going.",
@@ -121,6 +126,7 @@ export const COURSES = {
       },
       {
         n: 6,
+        related: ["cosmic-web", "cmb", "gravitational-waves", "big-bang"],
         icon: "🕸️",
         title: "The Universe's Large-Scale Structure",
         intro: "At the largest scale, the universe stops looking like scattered dots and starts looking like a brain.",
@@ -138,6 +144,7 @@ export const COURSES = {
       },
       {
         n: 7,
+        related: ["black-hole", "neutron-star", "quasar", "dark-energy"],
         icon: "🕳️",
         title: "The Extremes of the Universe",
         intro: "Where physics stops being polite.",
@@ -158,6 +165,7 @@ export const COURSES = {
       },
       {
         n: 8,
+        related: ["multiverse", "warp", "inflation", "anthropic"],
         icon: "🔮",
         title: "Theoretical & Hypothetical Entities",
         intro: "The final lesson is not knowledge. It is permission to wonder.",
@@ -194,6 +202,7 @@ export const COURSES = {
     levels: [
       {
         n: 1,
+        related: ["aryabhata", "varahamihira", "galileo", "kepler", "copernicus", "al-sufi"],
         icon: "🔭",
         title: "Ancient Beginnings: The Curiosity About Space",
         intro: "Before any engine, there was arithmetic. Before arithmetic, there was staring upward and refusing to look away.",
@@ -213,6 +222,7 @@ export const COURSES = {
       },
       {
         n: 2,
+        related: ["rocket", "tsiolkovsky", "goddard", "vonbraun", "spacex"],
         icon: "🚀",
         title: "The Birth of Rocketry",
         intro: "A rocket is Newton's third law wearing a metal coat. Push mass down hard enough and the sky stops being a ceiling.",
@@ -246,6 +256,7 @@ export const COURSES = {
       },
       {
         n: 3,
+        related: ["sputnik", "cubesat", "ion-drive", "iss"],
         icon: "🛰️",
         title: "Satellites: Setting and Working in Orbit",
         intro: "A satellite is a machine that has agreed to fall forever.",
@@ -273,6 +284,7 @@ export const COURSES = {
       },
       {
         n: 4,
+        related: ["sputnik", "gagarin", "apollo11", "voyager", "chandrayaan3", "perseverance"],
         icon: "🧭",
         title: "Space Exploration Milestones",
         intro: "The dates every cadet should know by heart.",
@@ -294,6 +306,7 @@ export const COURSES = {
       },
       {
         n: 5,
+        related: ["rtg", "isru", "cubesat", "curiosity"],
         icon: "⚙️",
         title: "Modern Space Technology",
         intro: "What keeps hardware working where there is no repair shop.",
@@ -313,6 +326,7 @@ export const COURSES = {
       },
       {
         n: 6,
+        related: ["hubble", "jwst", "elt", "m87"],
         icon: "🔭",
         title: "Space Telescopes & Observatories",
         intro: "Above the atmosphere, the picture finally stops shaking.",
@@ -331,6 +345,7 @@ export const COURSES = {
       },
       {
         n: 7,
+        related: ["iss", "life-support", "tiangong"],
         icon: "🏗️",
         title: "The International Space Station",
         intro: "The most expensive object ever built, and the best argument our species has ever made for itself.",
@@ -350,6 +365,7 @@ export const COURSES = {
       },
       {
         n: 8,
+        related: ["nasa", "esa", "isro", "roscosmos", "cnsa", "jaxa"],
         icon: "🏢",
         title: "Modern Space Agencies and Companies",
         intro: "Who actually flies today.",
@@ -376,6 +392,7 @@ export const COURSES = {
       },
       {
         n: 9,
+        related: ["artemis", "gateway", "msr", "space-elevator", "dyson"],
         icon: "🌕",
         title: "Future Space Technology",
         intro: "The blueprints already on the drawing board.",
@@ -396,6 +413,7 @@ export const COURSES = {
       },
       {
         n: 10,
+        related: ["earth", "sagan", "cubesat", "nasa"],
         icon: "📡",
         title: "What Space Technology Gives Us",
         intro: "Everything above matters because of everything below.",
@@ -415,6 +433,7 @@ export const COURSES = {
       },
       {
         n: 11,
+        related: ["qkd", "quantum", "starshot", "lisa"],
         icon: "⚛️",
         title: "Quantum Satellites & Future Space Technologies",
         intro: "The final lesson. Where physics becomes infrastructure.",

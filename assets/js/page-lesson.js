@@ -5,7 +5,7 @@ import { initShell, toast, mountVoiceBar, escapeHtml } from "./ui.js";
 import { COURSES, levelId, levelPlainText } from "./lessons.js";
 import { completeLevel, getProgress, currentUser, rankTitle } from "./store.js";
 import { speak, stopSpeaking } from "./voice.js";
-import { searchCodex } from "./universe.js";
+import { byId } from "./universe.js";
 
 const courseId = document.body.dataset.course;
 const pageIndex = parseInt(document.body.dataset.page, 10);
@@ -28,7 +28,10 @@ document.getElementById("course-header").innerHTML = `
 
 /* --------------------------------------------------- rendering */
 function relatedFor(level) {
-  const hits = searchCodex(level.title).slice(0, 4);
+  // Each level names its own codex entries. Searching on the title instead
+  // produced comic mismatches — "The Curiosity About Space" reached the
+  // Curiosity rover.
+  const hits = (level.related || []).map((id) => byId(id)).filter(Boolean);
   if (!hits.length) return "";
   return `<p class="pill-row" style="margin-top:.7rem">
     <span class="muted" style="font-size:.8rem">Go deeper:</span>
