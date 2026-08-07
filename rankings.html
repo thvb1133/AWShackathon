@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rankings · Beyond Orbit</title>
+<meta name="description" content="The Beyond Orbit leaderboard, stored as JSON in your browser's localStorage.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📊</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <div class="wrap">
+    <h1>📊 Top Cosmic Learners</h1>
+    <p class="muted">Scores are held as JSON in this browser's localStorage — no PHP, no database, no server.
+       Sorted by XP descending, with ties broken by levels cleared.</p>
+
+    <section class="card" id="you-card"></section>
+
+    <section class="card mt">
+      <div class="scroll-x">
+        <table id="board">
+          <thead><tr><th>#</th><th>Cadet</th><th>XP</th><th>Rank</th><th>Levels</th><th>Worlds</th><th>Badges</th><th>Best quiz</th><th>Streak</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="lesson-actions mt">
+        <button class="btn small ghost" id="btn-export">💾 Export all data</button>
+        <label class="btn small ghost" style="margin:0">📂 Import<input type="file" id="import-file" accept="application/json" hidden></label>
+        <button class="btn small ghost" id="btn-reset">🗑️ Reset this browser</button>
+      </p>
+      <p class="hint" id="io-status"></p>
+    </section>
+
+    <section class="card mt">
+      <h2>🏅 Every badge</h2>
+      <p class="muted">Badges are granted automatically the moment their condition is met.</p>
+      <div class="badge-grid mt" id="badge-wall"></div>
+    </section>
+  </div>
+</main>
+<script type="module" src="assets/js/page-rankings.js"></script>
+</body>
+</html>

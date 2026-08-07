@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cosmic Classroom · Beyond Orbit</title>
+<meta name="description" content="Choose your guide: MRS THORN BIRD for the poetic cosmos, MR PENGUIN for space technology.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🪐</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <div class="wrap">
+    <h1>🪐 The Cosmic Classroom</h1>
+    <p class="muted">Two mentors, nineteen levels. Reading a level clears it and scores it — but every level is also
+       wired to the live 3D scenes and the codex, so you can go and look at whatever you just read about.</p>
+
+    <section class="card" id="progress-summary"></section>
+
+    <div class="two-souls mt" id="course-cards"></div>
+
+    <section class="card mt">
+      <h2>🧭 Where each lesson takes you</h2>
+      <p class="muted">The classroom is not a wall of text. Each level links into the live parts of the application:</p>
+      <div class="grid three mt">
+        <a class="card" href="cosmos.html" style="text-decoration:none;color:inherit"><h3>🌍 Live Cosmos</h3><p class="muted">See the worlds a lesson describes, positioned for the exact second you are reading.</p></a>
+        <a class="card" href="orbitlab.html" style="text-decoration:none;color:inherit"><h3>🛰️ Orbit Lab</h3><p class="muted">Watch the real satellites the lesson names, flying right now.</p></a>
+        <a class="card" href="codex.html" style="text-decoration:none;color:inherit"><h3>📚 Codex</h3><p class="muted">Follow any name deeper — the person, the mission, the theory.</p></a>
+      </div>
+    </section>
+  </div>
+</main>
+<script type="module" src="assets/js/page-classroom.js"></script>
+</body>
+</html>

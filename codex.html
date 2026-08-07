@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Cosmic Codex · Beyond Orbit</title>
+<meta name="description" content="Everything humankind has found, built, imagined or planned beyond Earth — worlds, missions, people, theories, companies, spaceports and observatories.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📚</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <div class="wrap">
+    <h1>📚 The Cosmic Codex</h1>
+    <p class="muted" id="codex-intro">Loading the catalogue…</p>
+
+    <section class="card">
+      <div class="codex-toolbar">
+        <div class="field">
+          <label for="q">Search everything</label>
+          <input id="q" placeholder="black hole, Kalpana Chawla, quantum, Baikonur, ISRO, wormhole…" autocomplete="off">
+        </div>
+        <div class="field" style="flex:0 0 200px">
+          <label for="cat">Category</label>
+          <select id="cat"></select>
+        </div>
+        <div class="field" style="flex:0 0 200px">
+          <label for="era">Era</label>
+          <select id="era">
+            <option value="all">All of time</option>
+            <option value="past">🕰️ Past — already history</option>
+            <option value="present">🛰️ Present — happening now</option>
+            <option value="future">🔮 Future — planned or theorised</option>
+          </select>
+        </div>
+        <button class="btn small ghost" id="btn-random">🎲 Surprise me</button>
+      </div>
+      <div class="pill-row mt" id="quick-cats"></div>
+    </section>
+
+    <p class="muted mt" id="result-count"></p>
+    <div class="codex-grid" id="results"></div>
+    <p class="center mt"><button class="btn ghost" id="btn-more" hidden>Show more</button></p>
+
+    <dialog class="codex-dialog" id="entry-dialog"></dialog>
+  </div>
+</main>
+<script type="module" src="assets/js/page-codex.js"></script>
+</body>
+</html>
