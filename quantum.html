@@ -60,8 +60,8 @@
 
     <section class="card mt">
       <h2>🔬 Encode a sentence into a quantum state</h2>
-      <p class="muted">Type anything. It is turned into four bounded features, each becomes a rotation angle, and the
-         resulting 16-amplitude state is shown exactly as the simulator holds it.</p>
+      <p class="muted" id="encode-blurb">Type anything. Each intent gets its own bounded feature, every feature becomes a
+         rotation angle, and the resulting state is shown exactly as the simulator holds it.</p>
       <div class="codex-toolbar">
         <div class="field"><label for="probe">Your sentence</label>
           <input id="probe" value="where is the space station right now" autocomplete="off"></div>
@@ -69,7 +69,7 @@
       </div>
       <div class="split mt">
         <div>
-          <h3>State amplitudes — |ψ|² over 16 basis states</h3>
+          <h3 id="amp-heading">State amplitudes</h3>
           <div class="amp-bars" id="amp-bars"></div>
           <p class="hint" id="amp-note"></p>
         </div>
@@ -78,7 +78,7 @@
           <div id="probe-result"></div>
         </div>
       </div>
-      <h3 class="mt">Bloch vectors of the four qubits</h3>
+      <h3 class="mt" id="bloch-heading">Bloch vectors</h3>
       <div class="qubit-grid" id="bloch-grid"></div>
     </section>
 

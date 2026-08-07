@@ -9,6 +9,7 @@ import { bb84, grover, bellPair, QuantumRegister, quantumRandomBits } from "./qu
 
 initShell("quantum.html");
 
+const QUBITS = describeModel().qubits;
 const fmt = (v, d = 2) => Number(v).toLocaleString(undefined, { maximumFractionDigits: d });
 
 /* -------------------------------------------------- self-check */
@@ -187,6 +188,14 @@ function drawBloch(canvas, vector, label) {
   c.fillText(label, 4, size - 4);
 }
 
+document.getElementById("amp-heading").textContent =
+  `State amplitudes — |ψ|² over ${1 << QUBITS} basis states`;
+document.getElementById("bloch-heading").textContent =
+  `Bloch vectors of the ${QUBITS} qubits`;
+document.getElementById("encode-blurb").textContent =
+  `Type anything. It is turned into ${QUBITS} bounded features — one per intent — each becomes a rotation angle, ` +
+  `and the resulting ${1 << QUBITS}-amplitude state is shown exactly as the simulator holds it.`;
+
 function probe() {
   const text = document.getElementById("probe").value.trim() || "hello";
   const ins = inspect(text);
@@ -194,10 +203,10 @@ function probe() {
 
   const max = Math.max(...ins.probabilities);
   document.getElementById("amp-bars").innerHTML = ins.probabilities
-    .map((p, i) => `<div title="|${i.toString(2).padStart(4, "0")}⟩ = ${(p * 100).toFixed(2)}%" style="height:${Math.max(2, (p / max) * 100)}%"></div>`)
+    .map((p, i) => `<div title="|${i.toString(2).padStart(QUBITS, "0")}⟩ = ${(p * 100).toFixed(2)}%" style="height:${Math.max(2, (p / max) * 100)}%"></div>`)
     .join("");
   document.getElementById("amp-note").textContent =
-    `Largest amplitude: |${ins.probabilities.indexOf(max).toString(2).padStart(4, "0")}⟩ at ${(max * 100).toFixed(2)}%. ` +
+    `Largest amplitude: |${ins.probabilities.indexOf(max).toString(2).padStart(QUBITS, "0")}⟩ at ${(max * 100).toFixed(2)}%. ` +
     `Total probability ${ins.probabilities.reduce((a, b) => a + b, 0).toFixed(12)} — it must be exactly 1, and it is.`;
 
   const bar = (v) => `<div class="bar" style="height:6px"><span style="width:${Math.round(Math.max(0, Math.min(1, v)) * 100)}%"></span></div>`;
@@ -245,7 +254,8 @@ document.getElementById("btn-qkd").addEventListener("click", () => {
         <dt>Bases matched (sifted)</dt><dd>${fmt(r.sifted, 0)} — ${((r.sifted / r.bits) * 100).toFixed(1)}%, theory says 50%</dd>
         <dt>Sacrificed to check</dt><dd>${fmt(r.checked, 0)}</dd>
         <dt>Final key length</dt><dd>${fmt(r.keyLength, 0)} bits</dd>
-        <dt>Measured error rate</dt><dd style="color:${r.errorRate > 0.11 ? "var(--bad)" : "var(--good)"}">${(r.errorRate * 100).toFixed(2)}%</dd>
+        <dt>Measured error rate</dt><dd style="color:${r.errorRate > 0.11 ? "var(--bad)" : "var(--good)"}">${(r.errorRate * 100).toFixed(2)}%
+          <span class="muted" style="font-weight:400">± ${(r.errorStdErr * 100).toFixed(2)}% from ${r.checked} check bits${r.eavesdropper ? " · theory says 25%" : ""}</span></dd>
         <dt>Verdict</dt><dd>${r.secure
           ? '<span class="tick">✓ secure — key accepted</span>'
           : '<span class="cross">✗ ABORTED — error rate above the 11% threshold</span>'}</dd>

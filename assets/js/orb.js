@@ -19,10 +19,10 @@
 import * as THREE from "three";
 
 const STATES = {
-  idle: { a: new THREE.Color("#7d5cff"), b: new THREE.Color("#ff6fae"), wobble: 0.11, speed: 0.35, glow: 1.0, spin: 0.05 },
-  listening: { a: new THREE.Color("#ff4fa3"), b: new THREE.Color("#c46bff"), wobble: 0.20, speed: 0.9, glow: 1.6, spin: 0.16 },
-  thinking: { a: new THREE.Color("#ffb84d"), b: new THREE.Color("#ff5fae"), wobble: 0.30, speed: 2.4, glow: 1.9, spin: 0.55 },
-  speaking: { a: new THREE.Color("#ff7ac0"), b: new THREE.Color("#8f6bff"), wobble: 0.24, speed: 1.5, glow: 2.1, spin: 0.22 },
+  idle: { a: new THREE.Color("#6f4dff"), b: new THREE.Color("#ff5ea6"), wobble: 0.11, speed: 0.35, glow: 0.95, spin: 0.05 },
+  listening: { a: new THREE.Color("#ff2f93"), b: new THREE.Color("#b455ff"), wobble: 0.20, speed: 0.9, glow: 1.25, spin: 0.16 },
+  thinking: { a: new THREE.Color("#ffa62b"), b: new THREE.Color("#ff3f9e"), wobble: 0.26, speed: 2.4, glow: 1.45, spin: 0.55 },
+  speaking: { a: new THREE.Color("#ff5eb4"), b: new THREE.Color("#7d4dff"), wobble: 0.19, speed: 1.5, glow: 1.40, spin: 0.22 },
 };
 
 /* ---------------------------------------------------------- shaders */
@@ -32,7 +32,10 @@ const STATES = {
    the low-powered machines this has to run on. */
 const NOISE_GLSL = `
   float wob(vec3 p, float t) {
-    return sin(p.x * 2.7 + t) * sin(p.y * 3.1 - t * 1.27) * sin(p.z * 2.3 + t * 0.83);
+    // A sum of sines rather than a product. The product form has sharp
+    // lobes and turned the orb into a spiky crystal at high amplitude;
+    // summing gives smooth rolling swells instead.
+    return (sin(p.x * 2.7 + t) + sin(p.y * 3.1 - t * 1.27) + sin(p.z * 2.3 + t * 0.83)) * 0.3333;
   }
   float fbm(vec3 p, float t) {
     float v = wob(p, t) * 0.55;
@@ -56,7 +59,7 @@ const VERTEX = `
     float t = uTime * uSpeed;
     float n = fbm(normalize(position) * 1.6, t);
     // The microphone level and the speech pulse both push the surface out.
-    float amount = uWobble * (0.55 + uLevel * 2.4 + uPulse * 0.9);
+    float amount = uWobble * (0.5 + uLevel * 1.7 + uPulse * 0.5);
     vec3 displaced = position + normal * n * amount;
     vDisp = n;
     vNormalW = normalize(mat3(modelMatrix) * normal);
@@ -82,8 +85,15 @@ const FRAGMENT = `
     // A Fresnel rim: bright where the surface turns away from the eye.
     float fres = pow(1.0 - clamp(dot(normalize(vNormalW), normalize(vViewDir)), 0.0, 1.0), 2.4);
 
-    vec3 colour = base * (0.42 + 0.58 * mixer) + vec3(1.0, 0.85, 1.0) * fres * uGlow * 0.65;
-    colour += base * uLevel * 0.9;
+    vec3 colour = base * (0.48 + 0.52 * mixer) + vec3(1.0, 0.86, 1.0) * fres * uGlow * 0.40;
+    colour += base * uLevel * 0.45;
+
+    /* Reinhard tone mapping. Without it, a loud voice or the speaking
+       pulse drives every channel past 1.0 and the orb clips to a flat
+       white blob — the pink and the violet are the whole point, so the
+       highlights are rolled off instead of clipped. */
+    colour = colour / (colour + vec3(0.85));
+    colour = pow(colour, vec3(0.82));
     gl_FragColor = vec4(colour, 1.0);
   }
 `;
@@ -100,7 +110,7 @@ const SHELL_VERTEX = `
   void main() {
     float t = uTime * uSpeed * 0.7;
     float n = fbm(normalize(position) * 1.1, t);
-    vec3 displaced = position * (1.0 + n * uWobble * (0.4 + uLevel * 1.8));
+    vec3 displaced = position * (1.0 + n * uWobble * (0.38 + uLevel * 1.3));
     vN = normalize(mat3(modelMatrix) * normal);
     vec4 world = modelMatrix * vec4(displaced, 1.0);
     vV = normalize(cameraPosition - world.xyz);
@@ -225,7 +235,7 @@ export function createOrb(canvas, { detail = 5, particles = 900 } = {}) {
   const glow = new THREE.Sprite(
     new THREE.SpriteMaterial({ map: glowTexture(), blending: THREE.AdditiveBlending, transparent: true, depthWrite: false })
   );
-  glow.scale.setScalar(5.4);
+  glow.scale.setScalar(4.4);
   scene.add(glow);
 
   /* Orbiting sparks: they speed up when the orb is thinking. */
@@ -306,7 +316,7 @@ export function createOrb(canvas, { detail = 5, particles = 900 } = {}) {
     }
 
     uniforms.uTime.value = t;
-    shellUniforms.uOpacity.value = 0.35 + smoothLevel * 0.5 + (state === "thinking" ? 0.25 : 0);
+    shellUniforms.uOpacity.value = 0.26 + smoothLevel * 0.34 + (state === "thinking" ? 0.18 : 0);
 
     group.rotation.y += dt * target.spin;
     group.rotation.x = Math.sin(t * 0.25) * 0.12;
@@ -315,8 +325,8 @@ export function createOrb(canvas, { detail = 5, particles = 900 } = {}) {
 
     const breathe = 1 + smoothLevel * 0.16 + uniforms.uPulse.value * 0.04;
     group.scale.setScalar(breathe);
-    glow.scale.setScalar(5.0 + smoothLevel * 2.6 + (state === "thinking" ? 0.8 : 0));
-    glow.material.opacity = 0.55 + smoothLevel * 0.4;
+    glow.scale.setScalar(4.2 + smoothLevel * 1.6 + (state === "thinking" ? 0.5 : 0));
+    glow.material.opacity = 0.40 + smoothLevel * 0.3;
 
     // Sparks orbit; they whirl when thinking and drift when idle.
     const swirl = state === "thinking" ? 1.9 : state === "listening" ? 0.8 : 0.32;

@@ -669,6 +669,14 @@ export function bb84({ bits = 256, eavesdropper = false, channelNoise = 0, rando
   for (const i of checkIndices) if (aliceBits[i] !== bobBits[i]) mismatches++;
   const errorRate = checkIndices.length ? mismatches / checkIndices.length : 0;
 
+  /* The error rate is an *estimate* from a finite sample, and saying so
+     matters: with only a hundred or so check bits the standard error is
+     several percent, which is why a real system either sacrifices far more
+     bits or estimates the rate during error correction instead. */
+  const errorStdErr = checkIndices.length
+    ? Math.sqrt(Math.max(errorRate * (1 - errorRate), 1e-6) / checkIndices.length)
+    : 0;
+
   const key = keyIndices.map((i) => aliceBits[i]);
   // The textbook abort threshold is 11%; below that, privacy
   // amplification can still distil a secret key.
@@ -681,6 +689,7 @@ export function bb84({ bits = 256, eavesdropper = false, channelNoise = 0, rando
     keyLength: key.length,
     key,
     errorRate,
+    errorStdErr,
     secure,
     eavesdropper,
     channelNoise,

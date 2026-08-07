@@ -548,18 +548,18 @@ dialog::backdrop { background: rgba(2, 0, 12, 0.72); backdrop-filter: blur(3px);
   position: absolute; border-radius: 50%; pointer-events: none;
 }
 .orb-ring {
-  inset: 4%;
+  inset: -6%;
   border: 1px dashed rgba(255, 111, 174, 0.35);
   transform: rotateX(72deg);
   animation: orbspin 18s linear infinite;
 }
 .orb-ring::before {
-  content: ""; inset: -9%;
+  content: ""; inset: -14%;
   border: 1px dashed rgba(79, 215, 255, 0.28);
   animation: orbspin 27s linear infinite reverse;
 }
 .orb-ring::after {
-  content: ""; inset: 12%;
+  content: ""; inset: 4%;
   border: 1px solid rgba(155, 107, 255, 0.22);
   animation: orbspin 12s linear infinite;
 }
