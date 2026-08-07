@@ -24,6 +24,7 @@
 
 import { dispatch } from "./agents.js";
 import { classify, INTENTS, establishSessionKey, qkdEncrypt, qkdDecrypt } from "./qml.js";
+import { contextBlock, learnFrom } from "./memory.js";
 
 const CONFIG_KEY = "bo_llm_config";
 const QKD_KEY_STORE = "bo_qkd_material";
@@ -336,6 +337,13 @@ export async function ask(request, { onToken, onStage, signal } = {}) {
   const started = performance.now();
   const config = getConfig();
 
+  // Stage 0 — what do we already know about this person? Retrieved first,
+  // because the point of memory is that they never explain twice.
+  const memory = contextBlock(request);
+  if (memory.entries.length) {
+    onStage?.("memory", `Recalling ${memory.entries.length} thing(s) I already know about you…`);
+  }
+
   // Stage 1 — quantum machine learning decides what kind of ask this is.
   onStage?.("routing", "Classifying the request on the quantum circuit…");
   const intent = classify(request);
@@ -356,8 +364,8 @@ export async function ask(request, { onToken, onStage, signal } = {}) {
     messages.push({
       role: "user",
       content: config.groundInMesh
-        ? `${factsBlock(result)}\n\nThe cadet asks: ${request}`
-        : request,
+        ? [memory.text, factsBlock(result), `The cadet asks: ${request}`].filter(Boolean).join("\n\n")
+        : [memory.text, request].filter(Boolean).join("\n\n"),
     });
 
     try {
@@ -368,6 +376,8 @@ export async function ask(request, { onToken, onStage, signal } = {}) {
         text: text.trim(),
         reports: result.reports,
         intent,
+        memory: memory.entries,
+        learned: learnFrom(request),
         provider: PROVIDERS[config.provider].name,
         model: config.model,
         grounded: config.groundInMesh,
@@ -379,9 +389,11 @@ export async function ask(request, { onToken, onStage, signal } = {}) {
       // degrades to a plain answer rather than to nothing.
       onStage?.("fallback", `${error.message} — answering from the mesh instead.`);
       return {
-        text: summarise(result, request),
+        text: summarise(result, request, memory.entries),
         reports: result.reports,
         intent,
+        memory: memory.entries,
+        learned: learnFrom(request),
         provider: `${PROVIDERS[config.provider].name} unavailable — local mesh`,
         error: error.message,
         grounded: true,
@@ -392,12 +404,14 @@ export async function ask(request, { onToken, onStage, signal } = {}) {
   }
 
   onStage?.("summarising", "Answering from the mesh…");
-  const text = summarise(result, request);
+  const text = summarise(result, request, memory.entries);
   history.push({ role: "user", content: request }, { role: "assistant", content: text });
   return {
     text,
     reports: result.reports,
     intent,
+    memory: memory.entries,
+    learned: learnFrom(request),
     provider: "Local mesh",
     grounded: true,
     code: code ? { code: code.code, language: code.language } : null,
@@ -410,9 +424,12 @@ export async function ask(request, { onToken, onStage, signal } = {}) {
  * This is the no-language-model path, and it has to be good, because it
  * is the default and it is what runs offline.
  */
-function summarise(result, request) {
+function summarise(result, request, memories = []) {
   if (!result.reports.length) {
-    return `I have no specialist for that. Try naming a world, a mission, a company, a country, or an engineering quantity — for instance, where is the ISS right now, or how far is Mars today.`;
+    const known = memories.length
+      ? ` For what it is worth, I do already know ${memories.slice(0, 2).map((m) => m.text).join(" and ")}.`
+      : "";
+    return `I have no specialist for that. Try naming a world, a mission, a company, a country, or an engineering quantity — for instance, where is the ISS right now, or how far is Mars today.${known}`;
   }
   const first = result.reports[0];
   const lines = first.lines.filter((l) => l && l.length > 3).slice(0, 4);

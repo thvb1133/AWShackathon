@@ -8,7 +8,7 @@
    labels every answer with where it came from.
    ============================================================ */
 
-const VERSION = "beyond-orbit-v2";
+const VERSION = "beyond-orbit-v3";
 
 const SHELL = [
   "./",
@@ -20,6 +20,7 @@ const SHELL = [
   "mission-control.html",
   "agents.html",
   "jarvis.html",
+  "company.html",
   "quantum.html",
   "quiz.html",
   "rankings.html",
@@ -33,12 +34,17 @@ const SHELL = [
   "manifest.webmanifest",
   "assets/css/style.css",
   "assets/js/agents.js",
+  "assets/js/ambient.js",
+  "assets/js/automate.js",
   "assets/js/companies.js",
   "assets/js/converse.js",
+  "assets/js/crew.js",
   "assets/js/facilities.js",
   "assets/js/lessons.js",
+  "assets/js/integrations.js",
   "assets/js/live.js",
   "assets/js/llm.js",
+  "assets/js/memory.js",
   "assets/js/mentor.js",
   "assets/js/orb.js",
   "assets/js/orbit.js",
@@ -47,6 +53,7 @@ const SHELL = [
   "assets/js/page-agents.js",
   "assets/js/page-auth.js",
   "assets/js/page-classroom.js",
+  "assets/js/page-company.js",
   "assets/js/page-codex.js",
   "assets/js/page-cosmos.js",
   "assets/js/page-home.js",
