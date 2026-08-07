@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Register · Beyond Orbit</title>
+<meta name="description" content="Create a Beyond Orbit cadet record, stored locally in this browser.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧑‍🚀</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body data-mode="register">
+<main>
+  <div class="wrap" style="max-width:560px">
+    <h1>🧑‍🚀 Register for the cosmic journey</h1>
+    <p class="muted">Use <span class="mono">USERKIMCHI</span>, or invent your own cadet name. Everything is stored as
+       JSON in this browser — the password is hashed before it is written, and never leaves the device.</p>
+    <form class="card" id="auth-form" novalidate>
+      <div class="field">
+        <label for="username">Cadet name *</label>
+        <input id="username" name="username" autocomplete="username" placeholder="USERKIMCHI" required>
+        <p class="error" id="err-username"></p>
+      </div>
+      <div class="field">
+        <label for="email">Email *</label>
+        <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+        <p class="error" id="err-email"></p>
+      </div>
+      <div class="field">
+        <label for="phone">Phone</label>
+        <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="Optional">
+        <p class="error" id="err-phone"></p>
+      </div>
+      <div class="field">
+        <label for="address">Address</label>
+        <input id="address" name="address" autocomplete="street-address" placeholder="Optional">
+      </div>
+      <div class="field">
+        <label for="avatar">Choose your emblem</label>
+        <select id="avatar" name="avatar">
+          <option>🚀</option><option>🪶</option><option>🐧</option><option>🌟</option><option>🛰️</option>
+          <option>🪐</option><option>🌌</option><option>☄️</option><option>🔭</option><option>👩‍🚀</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="password">Password * — at least six characters</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" required>
+        <p class="error" id="err-password"></p>
+      </div>
+      <div class="field">
+        <label for="confirm">Confirm password *</label>
+        <input id="confirm" name="confirm" type="password" autocomplete="new-password" required>
+        <p class="error" id="err-confirm"></p>
+      </div>
+      <p class="lesson-actions">
+        <button class="btn primary" type="submit">Register</button>
+        <a class="btn ghost" href="login.html">Already have an account? Login</a>
+      </p>
+      <p class="error" id="err-form"></p>
+    </form>
+  </div>
+</main>
+<script type="module" src="assets/js/page-auth.js"></script>
+</body>
+</html>

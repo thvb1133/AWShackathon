@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live 3D Cosmos · Beyond Orbit</title>
+<meta name="description" content="A living Solar System rendered in 3D from real J2000 orbital elements — drag time from 1600 to 2200 and every world moves to where it truly is.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🌍</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <div class="wrap">
+    <h1>🌍 The Living Solar System</h1>
+    <p class="muted">Every body below is placed by solving Kepler's equation for the exact instant on the clock, from real
+       J2000 orbital elements. Nothing is a looping animation. Drag the year back to 1610 and Jupiter is where Galileo saw it.</p>
+
+    <div class="cosmos-shell mt">
+      <canvas id="solar-canvas" aria-label="Interactive 3D solar system"></canvas>
+      <div class="sky-layer" id="sky-labels"></div>
+
+      <div class="hud" id="hud-left">
+        <h4>🕒 Simulation clock</h4>
+        <div class="row"><span>Date</span><span id="hud-date">—</span></div>
+        <div class="row"><span>Rate</span><span id="hud-rate">—</span></div>
+        <div class="row"><span>Scale</span><span id="hud-scale">—</span></div>
+        <div class="row"><span>Frame</span><span id="hud-fps">—</span></div>
+      </div>
+
+      <aside class="hud right" id="hud-right">
+        <h4 id="sel-name">Select a world</h4>
+        <p class="muted" id="sel-hint" style="font-size:.8rem">Click any planet, moon, comet or probe. Double-click to lock the camera onto it.</p>
+        <div id="sel-body"></div>
+      </aside>
+
+      <div class="time-bar">
+        <button class="btn small" id="btn-pause">⏸ Pause</button>
+        <button class="btn small ghost" id="btn-now">Now</button>
+        <label class="sr-only" for="time-slider">Simulation date</label>
+        <input type="range" id="time-slider" min="-400" max="200" step="0.02" value="0">
+        <span class="mono" id="time-readout">—</span>
+        <label class="sr-only" for="speed-select">Speed</label>
+        <select id="speed-select" style="width:auto">
+          <option value="0.0000116">Real time</option>
+          <option value="0.05">1 hour / sec</option>
+          <option value="1" selected>1 day / sec</option>
+          <option value="7">1 week / sec</option>
+          <option value="30">1 month / sec</option>
+          <option value="365">1 year / sec</option>
+          <option value="3650">10 years / sec</option>
+        </select>
+      </div>
+
+      <div class="loading-cosmos" id="cosmos-loading">IGNITING THE COSMOS…</div>
+    </div>
+
+    <div class="card mt">
+      <div class="lesson-actions" id="quick-jump"></div>
+      <div class="lesson-actions mt">
+        <button class="btn small ghost" id="btn-orbits">Orbit lines: on</button>
+        <button class="btn small ghost" id="btn-labels">Labels: on</button>
+        <button class="btn small ghost" id="btn-belts">Belts: on</button>
+        <button class="btn small ghost" id="btn-scale">Scale: compressed</button>
+        <button class="btn small ghost" id="btn-reset">Reset view</button>
+        <button class="btn small" id="btn-narrate">🔊 Narrate this world</button>
+      </div>
+      <div id="voice-host" class="mt"></div>
+      <p class="hint mt">Voice: “show me Saturn”, “focus Europa”, “go to year 1969”, “faster”, “pause”, “true scale”, “reset”.</p>
+    </div>
+
+    <div class="split mt">
+      <section class="card">
+        <h2>What you are actually looking at</h2>
+        <ul>
+          <li><b>Positions</b> — heliocentric coordinates from J2000 elements, propagated with Newton–Raphson on Kepler's
+              equation. Accurate to a fraction of a degree over centuries.</li>
+          <li><b>Halley's Comet</b> flies its true 76-year ellipse. Push the clock to 2061 and watch it come back.</li>
+          <li><b>Voyager 1 and 2, Pioneer 10 and New Horizons</b> recede along their real ecliptic bearings at their
+              published rates.</li>
+          <li><b>Distances are compressed</b> by default, or the inner planets would be invisible specks. Switch to true
+              scale to feel how empty the Solar System really is.</li>
+          <li><b>Surfaces are generated in code</b> at page load — no image files are downloaded at all.</li>
+        </ul>
+      </section>
+      <section class="card">
+        <h2>🧭 Try this</h2>
+        <ul>
+          <li>Set the year to <b>1610</b> and watch Jupiter's moons — the four dots that ended the Earth-centred universe.</li>
+          <li>Set <b>1977</b> and step forward at 1 year/sec to see the Voyager Grand Tour alignment unwind.</li>
+          <li>Set <b>2061</b> for Halley's next perihelion.</li>
+          <li>Switch to true scale and try to find Neptune. That difficulty is the honest answer to “how big is space?”.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</main>
+<script type="module" src="assets/js/page-cosmos.js"></script>
+</body>
+</html>

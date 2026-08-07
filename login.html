@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login · Beyond Orbit</title>
+<meta name="description" content="Log in to your Beyond Orbit cadet record, stored locally in this browser.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🔑</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body data-mode="login">
+<main>
+  <div class="wrap" style="max-width:520px">
+    <h1>🔑 Login</h1>
+    <p class="muted">Your cadet record lives in this browser's localStorage. Nothing is transmitted anywhere.</p>
+    <form class="card" id="auth-form" novalidate>
+      <div class="field">
+        <label for="username">Cadet name</label>
+        <input id="username" name="username" autocomplete="username" placeholder="USERKIMCHI" required>
+        <p class="error" id="err-username"></p>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <p class="error" id="err-password"></p>
+      </div>
+      <p class="lesson-actions">
+        <button class="btn primary" type="submit">Login</button>
+        <a class="btn ghost" href="register.html">No account? Register</a>
+      </p>
+      <p class="error" id="err-form"></p>
+      <p class="hint">Demo cadets ship with the app so the leaderboard is never empty — try
+         <span class="mono">NOVA</span> with the password <span class="mono">cosmos</span>.</p>
+    </form>
+  </div>
+</main>
+<script type="module" src="assets/js/page-auth.js"></script>
+</body>
+</html>

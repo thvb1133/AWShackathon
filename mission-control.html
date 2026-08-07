@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mission Control · Beyond Orbit</title>
+<meta name="description" content="Live public space data: NASA APOD, near-Earth objects, space weather, solar wind, worldwide launch schedules and live orbital elements.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📡</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <div class="wrap">
+    <h1>📡 Mission Control</h1>
+    <p class="muted">Every panel below is a free, public, no-signup feed. Each one is tagged with where the data came
+       from right now: <span class="source-tag live">live</span> straight from the source,
+       <span class="source-tag cache">cache</span> from an earlier successful call,
+       <span class="source-tag offline">offline-snapshot</span> bundled with the app, or
+       <span class="source-tag down">unavailable</span>.</p>
+
+    <section class="card">
+      <h2>🔑 NASA API key</h2>
+      <p class="muted">NASA's <span class="mono">DEMO_KEY</span> works with no signup at 30 requests per hour.
+         A free personal key from <a href="https://api.nasa.gov" target="_blank" rel="noopener">api.nasa.gov</a>
+         raises that to 1,000 per hour. It is stored only in this browser.</p>
+      <div class="codex-toolbar">
+        <div class="field"><label for="api-key">Your key (optional)</label><input id="api-key" placeholder="DEMO_KEY"></div>
+        <button class="btn small" id="btn-save-key">Save key</button>
+        <button class="btn small ghost" id="btn-clear-cache">Clear cached feeds</button>
+        <button class="btn small ghost" id="btn-refresh">Refresh everything</button>
+      </div>
+      <p class="hint mt" id="key-status"></p>
+      <hr style="border-color:var(--line);margin:1rem 0">
+      <h3>🔁 Optional CORS relay</h3>
+      <p class="muted">JPL's Solar System Dynamics service is free and keyless, but it does not send CORS headers, so a
+         browser cannot read its replies. Supplying any relay prefix — one that takes the target URL, encoded, on the end
+         or in a <span class="mono">{url}</span> placeholder — unlocks the two JPL panels below. Everything else works
+         without it.</p>
+      <div class="codex-toolbar">
+        <div class="field"><label for="relay">Relay prefix</label><input id="relay" placeholder="https://your-proxy.example/?url={url}"></div>
+        <button class="btn small" id="btn-save-relay">Save relay</button>
+        <button class="btn small ghost" id="btn-clear-relay">Remove</button>
+      </div>
+      <p class="hint mt" id="relay-status"></p>
+    </section>
+
+    <div class="grid three mt" id="metric-row"></div>
+
+    <div class="split mt">
+      <section class="card" id="apod-card"><h2>🖼️ NASA Astronomy Picture of the Day</h2><p class="muted">Loading…</p></section>
+      <section class="card" id="weather-card"><h2>☀️ Space weather</h2><p class="muted">Loading…</p></section>
+    </div>
+
+    <div class="split mt">
+      <section class="card" id="neo-card"><h2>☄️ Asteroids passing Earth</h2><p class="muted">Loading…</p></section>
+      <section class="card" id="launch-card"><h2>🚀 Next launches worldwide</h2><p class="muted">Loading…</p></section>
+    </div>
+
+    <div class="split mt">
+      <section class="card" id="cad-card"><h2>🎯 JPL close approaches</h2><p class="muted">Loading…</p></section>
+      <section class="card" id="fireball-card"><h2>💥 Recent fireballs</h2><p class="muted">Loading…</p></section>
+    </div>
+
+    <section class="card mt" id="source-card">
+      <h2>🔌 Source health</h2>
+      <p class="muted">Every feed the app can reach, tested live. This is also the honest answer to “where does this data
+         come from?” — nothing here is scraped or invented.</p>
+      <div class="scroll-x"><table id="source-table">
+        <thead><tr><th>Feed</th><th>Host</th><th>Key?</th><th>Status</th><th>Latency</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+      <p class="lesson-actions"><button class="btn small" id="btn-test">Test all sources</button></p>
+    </section>
+  </div>
+</main>
+<script type="module" src="assets/js/page-mission.js"></script>
+</body>
+</html>
