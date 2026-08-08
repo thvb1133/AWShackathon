@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operations · Beyond Orbit</title>
+<meta name="description" content="Your agent teams, persistent memory, scheduled automations, approval inbox and integrations — the operating console for Beyond Orbit.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🏢</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <div class="wrap">
+    <h1 class="gradient-text">🏢 Operations</h1>
+    <p class="muted">The console the whole company runs from. Your teams work, the results land in an inbox, and you
+       approve or reject like a boss reviewing drafts. Nothing is ever sent anywhere until you say so.</p>
+
+    <div class="op-grid" id="status-strip"></div>
+
+    <!-- ============ Server ============ -->
+    <section class="card mt" id="server">
+      <h2>🖥️ PHP, database &amp; Python ML server</h2>
+      <p class="muted">The static application works without a server. Connect this optional backend when you want real
+         bcrypt accounts, a SQLite/MySQL database, data that follows you to another device, server-side JPL feed access,
+         and the Python quantum-kernel classifier.</p>
+      <div class="codex-toolbar">
+        <div class="field"><label for="api-url">API base URL</label>
+          <input id="api-url" placeholder="Same origin /api (leave blank when PHP serves this site)"></div>
+        <button class="btn small" id="btn-check-api">Test server</button>
+        <button class="btn ghost small" id="btn-save-api">Save URL</button>
+        <button class="btn ghost small" id="btn-install-api">Install SQLite schema</button>
+      </div>
+      <div class="mt" id="api-status"></div>
+      <details class="mt">
+        <summary class="btn small ghost" style="display:inline-flex">How to run it locally</summary>
+        <pre class="code"><code># Terminal 1 — Python ML
+python3 server/python/service.py
+
+# Terminal 2 — PHP serves both the site and /api
+php -S 127.0.0.1:8081 server/router.php
+
+# One-time SQLite install
+curl -X POST http://127.0.0.1:8081/api/install</code></pre>
+        <p class="muted">Then open <span class="mono">http://127.0.0.1:8081</span>. Full MySQL/MariaDB deployment
+           instructions are in <span class="mono">server/README.md</span>.</p>
+      </details>
+    </section>
+
+    <!-- ============ Memory ============ -->
+    <section class="card mt" id="memory">
+      <h2>🧠 Memory — so you never explain twice</h2>
+      <p class="muted">Everything JARVIS knows about you, scored by confidence, with a forget button on every line.
+         Confidence rises when a fact is confirmed or used and decays when it goes untouched. Nothing here is hidden
+         from you, and nothing leaves this browser unless you have connected a language model.</p>
+
+      <details id="profile-setup" class="mt">
+        <summary class="btn small" style="display:inline-flex">✍️ Tell me about you and your business (once)</summary>
+        <div class="grid two mt">
+          <div class="field"><label for="p-name">Your name</label><input id="p-name" placeholder="Beejalben"></div>
+          <div class="field"><label for="p-company">Company</label><input id="p-company" placeholder="Beyond Orbit"></div>
+          <div class="field"><label for="p-does">What it does</label><input id="p-does" placeholder="space education and satellite data tooling"></div>
+          <div class="field"><label for="p-goal">Main goal right now</label><input id="p-goal" placeholder="launch the platform and get the first hundred users"></div>
+          <div class="field"><label for="p-prefers">How you like to be answered</label><input id="p-prefers" placeholder="short answers, numbers first, no fluff"></div>
+        </div>
+        <p class="lesson-actions"><button class="btn primary small" id="btn-save-profile">Save to memory</button>
+          <span class="hint">Saved as pinned entries, so they never decay.</span></p>
+      </details>
+
+      <div class="codex-toolbar mt">
+        <div class="field"><label for="mem-add">Add something by hand</label>
+          <input id="mem-add" placeholder="e.g. We always publish on Tuesdays"></div>
+        <div class="field" style="flex:0 0 190px"><label for="mem-kind">Kind</label><select id="mem-kind"></select></div>
+        <button class="btn small" id="btn-mem-add">Remember it</button>
+        <button class="btn ghost small" id="btn-mem-export">💾 Export</button>
+        <button class="btn ghost small" id="btn-mem-forget-all">🗑️ Forget everything</button>
+      </div>
+      <p class="hint mt" id="mem-summary"></p>
+      <div id="memory-list" class="mt"></div>
+    </section>
+
+    <!-- ============ Crews ============ -->
+    <section class="card mt" id="crews">
+      <h2>👥 Agent crews — a team, not a crowd</h2>
+      <p class="muted">The mesh answers a question with several specialists at once. A <b>crew</b> is different: it plans
+         steps, runs them in order, and hands each one's findings to the next. They address each other by name and you
+         can read the whole exchange.</p>
+      <div class="codex-toolbar">
+        <div class="field"><label for="crew-brief">What do you want done?</label>
+          <input id="crew-brief" placeholder="design a 150 kg imaging satellite at 550 km"></div>
+        <div class="field" style="flex:0 0 240px"><label for="crew-pick">Crew</label><select id="crew-pick"></select></div>
+        <button class="btn primary small" id="btn-run-crew">Run the crew</button>
+      </div>
+      <p class="pill-row mt" id="crew-examples"></p>
+      <div id="crew-progress" class="mt"></div>
+      <div id="crew-transcript" class="mt"></div>
+    </section>
+
+    <!-- ============ Automations ============ -->
+    <section class="card mt" id="automations">
+      <h2>⏰ Automations — work that happens without you</h2>
+      <p class="muted" id="scheduler-note"></p>
+      <div class="codex-toolbar">
+        <div class="field"><label for="job-brief">Brief</label><input id="job-brief" placeholder="overnight status of orbit"></div>
+        <div class="field" style="flex:0 0 210px"><label for="job-crew">Crew</label><select id="job-crew"></select></div>
+        <div class="field" style="flex:0 0 180px"><label for="job-interval">How often</label><select id="job-interval"></select></div>
+        <div class="field" style="flex:0 0 200px"><label for="job-hook">Send on approval (optional)</label><input id="job-hook" placeholder="webhook URL"></div>
+        <button class="btn primary small" id="btn-add-job">Schedule it</button>
+        <button class="btn small" id="btn-alerts">🔔 Enable alerts</button>
+      </div>
+      <div class="mt" id="suggested-jobs"></div>
+      <div class="mt" id="job-list"></div>
+    </section>
+
+    <!-- ============ Inbox ============ -->
+    <section class="card mt" id="inbox">
+      <h2>📥 Approval inbox <span class="chip gold" id="inbox-count">0 waiting</span></h2>
+      <p class="muted">Finished work, waiting on your decision. Approving is what fires the webhook — before that,
+         nothing has left this device.</p>
+      <p class="lesson-actions">
+        <button class="btn small ghost" id="btn-read-inbox">📧 What is in my email?</button>
+        <button class="btn small ghost" id="btn-clear-inbox">Clear decided items</button>
+      </p>
+      <div id="email-report"></div>
+      <div id="inbox-list" class="mt"></div>
+    </section>
+
+    <!-- ============ Integrations ============ -->
+    <section class="card mt" id="integrations">
+      <h2>🔌 Integrations</h2>
+      <p class="muted" id="reach-note"></p>
+      <div class="codex-toolbar">
+        <div class="field"><label for="conn-url">Webhook URL</label><input id="conn-url" placeholder="https://hooks.zapier.com/hooks/catch/…"></div>
+        <div class="field" style="flex:0 0 200px"><label for="conn-name">Name it</label><input id="conn-name" placeholder="Post to LinkedIn"></div>
+        <button class="btn small" id="btn-add-conn">Add</button>
+        <button class="btn ghost small" id="btn-test-conn">Send a test</button>
+      </div>
+      <p class="hint mt" id="conn-status"></p>
+      <div class="grid three mt" id="destination-cards"></div>
+      <div class="mt" id="connection-list"></div>
+
+      <h3 class="mt">📧 Reading your email</h3>
+      <div id="bridge-help"></div>
+      <div class="codex-toolbar mt">
+        <div class="field"><label for="bridge-url">Inbox bridge URL</label><input id="bridge-url" placeholder="https://…/my-inbox.json"></div>
+        <button class="btn small" id="btn-save-bridge">Save</button>
+      </div>
+    </section>
+
+    <!-- ============ Honest limits ============ -->
+    <section class="card mt">
+      <h2>What this can and cannot do</h2>
+      <ul id="limits"></ul>
+    </section>
+  </div>
+</main>
+<script type="module" src="assets/js/page-company.js"></script>
+</body>
+</html>

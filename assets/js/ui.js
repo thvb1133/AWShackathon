@@ -11,12 +11,16 @@ import { speak, stopSpeaking, canSpeak, canListen, createVoiceCommander } from "
 
 export const NAV = [
   { href: "index.html", label: "Home", icon: "🏠" },
+  { href: "jarvis.html", label: "JARVIS", icon: "🔮" },
+  { href: "company.html", label: "Operations", icon: "🏢" },
+  { href: "ventures.html", label: "Ventures", icon: "💼" },
   { href: "classroom.html", label: "Classroom", icon: "🪐" },
   { href: "cosmos.html", label: "Live Cosmos", icon: "🌍" },
   { href: "orbitlab.html", label: "Orbit Lab", icon: "🛰️" },
   { href: "codex.html", label: "Codex", icon: "📚" },
   { href: "mission-control.html", label: "Mission Control", icon: "📡" },
   { href: "agents.html", label: "Agent Mesh", icon: "🤖" },
+  { href: "quantum.html", label: "Quantum Core", icon: "⚛️" },
   { href: "quiz.html", label: "Quiz", icon: "📝" },
   { href: "rankings.html", label: "Rankings", icon: "📊" },
   { href: "about.html", label: "About", icon: "📖" },
@@ -136,8 +140,17 @@ function buildNav(active) {
     links.classList.toggle("open");
     e.currentTarget.setAttribute("aria-expanded", links.classList.contains("open"));
   });
-  nav.querySelector("#logout-btn")?.addEventListener("click", () => {
+  nav.querySelector("#logout-btn")?.addEventListener("click", async () => {
     stopSpeaking();
+    // If this was a PHP-backed session, invalidate the server token before
+    // navigating away. Navigating first cancels the fetch and leaves a
+    // bearer token sitting in localStorage.
+    try {
+      const api = await import("./api.js");
+      await api.logout();
+    } catch {
+      // api.logout() clears its token in finally; a missing API is harmless.
+    }
     logout();
     window.location.href = "index.html";
   });
@@ -305,7 +318,22 @@ export function initShell(activePage) {
   buildNav(activePage);
   buildFooter();
   if (!canSpeak()) console.info("Speech synthesis unavailable in this browser.");
-  import("./mentor.js").then((m) => m.mountMentor()).catch(() => {});
+  // Train the quantum classifier off the critical path, so a first visit
+  // never waits on it. Cached weights make every later visit instant.
+  import("./qml.js").then((m) => m.warmUp()).catch(() => {});
+
+  /* JARVIS docks in the corner of every page and, once the microphone has
+     been granted, arms itself without being asked. The older floating
+     console does the same job with a button, so it is only mounted when
+     the dock cannot be — two orbs in one corner is clutter, not features. */
+  import("./ambient.js")
+    .then((m) => {
+      if (!m.mountAmbient()) throw new Error("ambient dock unavailable");
+    })
+    .catch(() => import("./mentor.js").then((m) => m.mountMentor()).catch(() => {}));
+  // Scheduled work runs while any Beyond Orbit tab is open, and catches up
+  // on anything that fell due while they were all closed.
+  import("./automate.js").then((m) => m.startScheduler()).catch(() => {});
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
     navigator.serviceWorker.register("sw.js").catch(() => {});
   }

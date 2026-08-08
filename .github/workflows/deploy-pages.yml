@@ -1,0 +1,49 @@
+name: Deploy to GitHub Pages
+
+# Beyond Orbit is a static site with no build step, so deployment is just
+# publishing the repository as-is. Every path in the app is relative, which
+# is what lets it work from a project subpath such as /AWShackathon/.
+
+on:
+  push:
+    branches: [main]
+  # Lets you publish any branch by hand from the Actions tab.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deployments race; the newest push wins.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check that nothing is missing
+        run: |
+          set -e
+          for f in index.html jarvis.html quantum.html sw.js manifest.webmanifest \
+                   assets/css/style.css assets/js/quantum.js assets/js/qml.js \
+                   assets/js/agents.js assets/js/orb.js assets/vendor/three.module.js; do
+            test -f "$f" || { echo "::error::missing $f"; exit 1; }
+          done
+          echo "All required files present."
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

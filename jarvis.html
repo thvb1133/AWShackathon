@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JARVIS · Beyond Orbit</title>
+<meta name="description" content="Talk to Beyond Orbit. A pink and purple orb that listens with your microphone, routes your words through a quantum classifier, and answers out loud.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🔮</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <div class="wrap">
+
+    <section class="orb-stage">
+      <div class="orb-holder">
+        <canvas id="orb-canvas" aria-label="The JARVIS orb, which reacts to your voice"></canvas>
+        <div class="orb-ring" aria-hidden="true"></div>
+      </div>
+
+      <div class="orb-side">
+        <h1 class="gradient-text" style="margin-bottom:.2rem">JARVIS</h1>
+        <p class="muted" id="orb-state-line">Press <b>Start talking</b> and just speak. I listen, think and answer out loud.</p>
+
+        <div class="pill-row mt" id="pipeline-strip">
+          <span class="chip" id="stage-quantum">⚛️ Quantum routing</span>
+          <span class="chip" id="stage-mesh">🤖 Agent mesh</span>
+          <span class="chip" id="stage-llm">🗣️ Language model</span>
+          <span class="chip" id="stage-voice">🔊 Voice</span>
+        </div>
+
+        <p class="lesson-actions mt">
+          <button class="btn primary" id="btn-talk">🎙️ Start talking</button>
+          <button class="btn ghost" id="btn-mute">🔇 Stop speaking</button>
+          <button class="btn ghost small" id="btn-settings-llm">⚙️ Brain settings</button>
+        </p>
+
+        <form class="mentor-input" id="type-form" style="border:0;padding:0" >
+          <input id="type-input" placeholder="…or type it instead" autocomplete="off" aria-label="Type a request">
+          <button class="btn small" type="submit">Send</button>
+        </form>
+
+        <p class="hint mt" id="support-note"></p>
+      </div>
+    </section>
+
+    <div class="split mt">
+      <section class="card" id="transcript-card">
+        <h2>🗒️ Conversation</h2>
+        <p class="muted" id="live-interim">&nbsp;</p>
+        <div class="mentor-log" id="transcript" style="max-height:420px"></div>
+      </section>
+
+      <aside class="card">
+        <h2>🔍 What just happened</h2>
+        <p class="muted" style="font-size:.85rem">Every answer passes through the same three stages, and each one is shown
+           here so nothing is a black box.</p>
+        <div id="explain"></div>
+      </aside>
+    </div>
+
+    <section class="card mt" id="brain-card">
+      <h2>🧠 The brain</h2>
+      <p class="muted">Beyond Orbit answers in two stages, in this order: <b>the agent mesh computes the facts</b>, then
+         <b>a language model phrases them</b>. That ordering is deliberate — the model never supplies a number, so it
+         cannot invent one. With no model configured you still get every fact, just more bluntly.</p>
+
+      <div class="grid two mt">
+        <div>
+          <div class="field">
+            <label for="provider">Provider — every one of these has a free tier</label>
+            <select id="provider"></select>
+          </div>
+          <div class="field">
+            <label for="model">Model</label>
+            <select id="model"></select>
+          </div>
+          <div class="field" id="key-field">
+            <label for="api-key">API key <span class="muted">— stored in this browser, encrypted with the BB84 key</span></label>
+            <input id="api-key" type="password" placeholder="paste your free key" autocomplete="off">
+          </div>
+          <p class="lesson-actions">
+            <button class="btn primary small" id="btn-save-llm">Save</button>
+            <button class="btn small" id="btn-test-llm">Test connection</button>
+            <button class="btn ghost small" id="btn-forget-key">Forget key</button>
+          </p>
+          <p class="hint" id="llm-status"></p>
+        </div>
+        <div>
+          <h3 style="font-size:1.05rem">How to get a free key</h3>
+          <p class="muted" id="provider-note"></p>
+          <p><a class="btn small ghost" id="provider-signup" href="#" target="_blank" rel="noopener">Open the signup page →</a></p>
+          <div class="field">
+            <label><input type="checkbox" id="ground" style="width:auto"> Ground every reply in the mesh's facts (recommended)</label>
+          </div>
+          <div class="field">
+            <label><input type="checkbox" id="wake" style="width:auto"> Require the wake word “Jarvis” before answering</label>
+          </div>
+          <div class="field">
+            <label for="temperature">Creativity — <span id="temp-val"></span></label>
+            <input type="range" id="temperature" min="0" max="1.2" step="0.1">
+          </div>
+          <p class="hint">Nothing is sent anywhere until you configure a provider. On <b>Local mesh only</b> the whole
+             application runs offline.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card mt">
+      <h2>💬 Say any of these out loud</h2>
+      <div class="pill-row" id="samples"></div>
+    </section>
+
+  </div>
+</main>
+<script type="module" src="assets/js/page-jarvis.js"></script>
+</body>
+</html>

@@ -6,6 +6,7 @@
 const K = {
   users: "bo_users",
   session: "bo_session",
+  serverProfile: "bo_server_profile",
   progress: "bo_progress",
   settings: "bo_settings",
 };
@@ -67,11 +68,24 @@ export function loginUser(username, password) {
   return user;
 }
 
-export const logout = () => localStorage.removeItem(K.session);
-export const currentUsername = () => localStorage.getItem(K.session);
+export const logout = () => {
+  localStorage.removeItem(K.session);
+  localStorage.removeItem(K.serverProfile);
+};
+/** Server-backed sessions keep the display profile separately from the
+    bearer token held by api.js. This lets the shared nav recognise a
+    PHP login without ever storing its password locally. */
+export const saveServerProfile = (user) => {
+  if (user?.username) write(K.serverProfile, user);
+  return user;
+};
+export const clearServerProfile = () => localStorage.removeItem(K.serverProfile);
+export const serverProfile = () => read(K.serverProfile, null);
+
+export const currentUsername = () => localStorage.getItem(K.session) || serverProfile()?.username || null;
 export function currentUser() {
   const name = currentUsername();
-  return name ? getUsers()[name] || null : null;
+  return name ? getUsers()[name] || serverProfile() || null : null;
 }
 
 /* ------------------------------------------------------ Progress */

@@ -529,6 +529,252 @@ dialog::backdrop { background: rgba(2, 0, 12, 0.72); backdrop-filter: blur(3px);
 .tick { color: var(--good); }
 .cross { color: var(--bad); }
 .pill-row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+/* ============================================================
+   The JARVIS orb stage
+   ============================================================ */
+.orb-stage {
+  display: grid; grid-template-columns: minmax(280px, 520px) 1fr;
+  gap: 2rem; align-items: center; padding: 1.4rem 0 0.6rem;
+}
+@media (max-width: 900px) { .orb-stage { grid-template-columns: 1fr; } }
+
+.orb-holder { position: relative; aspect-ratio: 1; width: 100%; max-width: 520px; margin: 0 auto; }
+#orb-canvas { display: block; width: 100%; height: 100%; position: relative; z-index: 2; }
+
+/* Two counter-rotating dashed rings, so the orb reads as a 3D object
+   sitting inside something rather than a flat circle. */
+.orb-ring, .orb-ring::before, .orb-ring::after {
+  position: absolute; border-radius: 50%; pointer-events: none;
+}
+.orb-ring {
+  inset: -6%;
+  border: 1px dashed rgba(255, 111, 174, 0.35);
+  transform: rotateX(72deg);
+  animation: orbspin 18s linear infinite;
+}
+.orb-ring::before {
+  content: ""; inset: -14%;
+  border: 1px dashed rgba(79, 215, 255, 0.28);
+  animation: orbspin 27s linear infinite reverse;
+}
+.orb-ring::after {
+  content: ""; inset: 4%;
+  border: 1px solid rgba(155, 107, 255, 0.22);
+  animation: orbspin 12s linear infinite;
+}
+@keyframes orbspin { to { transform: rotateX(72deg) rotate(360deg); } }
+
+.orb-side h1 { font-size: clamp(2.4rem, 6vw, 4rem); letter-spacing: 0.04em; }
+
+.chip-live {
+  background: linear-gradient(135deg, var(--thorn), var(--violet));
+  color: #fff; border-color: transparent;
+  box-shadow: 0 0 18px rgba(255, 111, 174, 0.55);
+}
+.chip-off { opacity: 0.45; }
+
+/* ============================================================
+   Depth: give the flat panels a sense of being lit and raised
+   ============================================================ */
+.card {
+  position: relative;
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 42%),
+    var(--panel);
+  box-shadow:
+    var(--shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 0.25s, border-color 0.25s;
+}
+a.card:hover, .codex-card:hover {
+  transform: translateY(-4px) scale(1.008);
+  border-color: rgba(255, 111, 174, 0.5);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 34px rgba(155, 107, 255, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+.metric {
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 45%),
+    var(--panel);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 26px rgba(0, 0, 0, 0.4);
+}
+.btn {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+.btn.primary, .btn.ice {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 8px 22px rgba(155, 107, 255, 0.4);
+}
+h1 { text-shadow: 0 0 38px rgba(155, 107, 255, 0.35); }
+.gradient-text {
+  background: linear-gradient(100deg, var(--thorn), var(--gold) 40%, var(--penguin) 78%, var(--violet));
+  background-size: 220% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: sheen 9s ease-in-out infinite;
+}
+@keyframes sheen { 50% { background-position: 100% 0; } }
+
+/* ============================================================
+   The ambient dock — JARVIS in the corner of every page
+   ============================================================ */
+#ambient-dock {
+  position: fixed; right: 18px; bottom: 18px; z-index: 88;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;
+  pointer-events: none;
+}
+#ambient-dock > * { pointer-events: auto; }
+.ambient-expand {
+  width: 30px; height: 26px; border-radius: 9px; cursor: pointer;
+  background: rgba(8, 4, 24, 0.9); color: var(--ink-dim);
+  border: 1px solid var(--line); font-size: 0.8rem; line-height: 1;
+}
+.ambient-expand:hover { color: #fff; background: rgba(155, 107, 255, 0.4); }
+
+.ambient-orb {
+  position: relative; width: 92px; height: 92px; padding: 0;
+  border: 0; border-radius: 50%; cursor: pointer; background: transparent;
+  filter: drop-shadow(0 8px 26px rgba(155, 107, 255, 0.55));
+  transition: transform 0.25s;
+}
+.ambient-orb:hover { transform: scale(1.06); }
+.ambient-orb canvas { width: 100%; height: 100%; display: block; border-radius: 50%; }
+
+/* A ring whose colour states what the assistant is doing right now. */
+.ambient-orb::after {
+  content: ""; position: absolute; inset: -6px; border-radius: 50%;
+  border: 2px solid transparent; transition: border-color 0.3s, box-shadow 0.3s;
+}
+#ambient-dock[data-state="idle"] .ambient-orb::after { border-color: rgba(141, 137, 187, 0.5); }
+#ambient-dock[data-state="listening"] .ambient-orb::after {
+  border-color: var(--thorn); box-shadow: 0 0 22px rgba(255, 111, 174, 0.7);
+  animation: listenpulse 2s ease-in-out infinite;
+}
+#ambient-dock[data-state="thinking"] .ambient-orb::after {
+  border-color: var(--gold); box-shadow: 0 0 24px rgba(255, 209, 102, 0.7);
+}
+#ambient-dock[data-state="speaking"] .ambient-orb::after {
+  border-color: var(--penguin); box-shadow: 0 0 24px rgba(79, 215, 255, 0.7);
+}
+@keyframes listenpulse { 50% { box-shadow: 0 0 40px rgba(255, 111, 174, 0.35); } }
+
+.ambient-badge {
+  position: absolute; top: 2px; right: 2px; min-width: 22px; height: 22px;
+  border-radius: 11px; background: var(--bad); color: #fff;
+  font-size: 0.72rem; font-weight: 700; line-height: 22px; text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.ambient-caption {
+  max-width: min(360px, 76vw); padding: 0.45rem 0.8rem; border-radius: 14px;
+  background: rgba(8, 4, 24, 0.92); border: 1px solid var(--line);
+  font-size: 0.84rem; backdrop-filter: blur(8px);
+  opacity: 0; transform: translateY(6px); transition: opacity 0.25s, transform 0.25s;
+}
+.ambient-caption.show { opacity: 1; transform: none; }
+
+.ambient-panel {
+  width: min(340px, 82vw); border-radius: 16px; overflow: hidden;
+  background: var(--panel-solid); border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  max-height: 0; opacity: 0; transition: max-height 0.3s, opacity 0.3s;
+}
+#ambient-dock:hover .ambient-panel,
+#ambient-dock:focus-within .ambient-panel,
+#ambient-dock.open .ambient-panel,
+#ambient-dock[data-state="thinking"] .ambient-panel,
+#ambient-dock[data-state="speaking"] .ambient-panel { max-height: 380px; opacity: 1; }
+
+/* Clipped and transparent is not the same as gone: without this, the input
+   inside a closed panel is still focusable and clickable by accident. */
+.ambient-panel { visibility: hidden; }
+#ambient-dock:hover .ambient-panel,
+#ambient-dock:focus-within .ambient-panel,
+#ambient-dock.open .ambient-panel,
+#ambient-dock[data-state="thinking"] .ambient-panel,
+#ambient-dock[data-state="speaking"] .ambient-panel { visibility: visible; }
+
+.ambient-panel-head {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--line);
+}
+.ambient-panel-head strong { flex: 1; font-size: 0.85rem; }
+.ambient-log { max-height: 210px; overflow-y: auto; padding: 0.5rem 0.7rem; font-size: 0.8rem; }
+.ambient-line { margin: 0.3rem 0; line-height: 1.45; }
+.ambient-line.you { color: var(--ink-dim); }
+.ambient-line.jarvis { color: var(--ink); }
+.ambient-line b { color: var(--thorn-soft); margin-right: 0.3rem; }
+.ambient-toggle {
+  display: flex; align-items: center; gap: 0.4rem; font-size: 0.76rem;
+  padding: 0.5rem 0.7rem; border-top: 1px solid var(--line); color: var(--ink-faint); margin: 0;
+}
+.ambient-toggle input { width: auto; }
+
+.ambient-type {
+  display: flex; gap: 0.35rem; padding: 0.5rem 0.7rem; border-top: 1px solid var(--line);
+}
+.ambient-type input { flex: 1; padding: 0.4rem 0.6rem; font-size: 0.82rem; }
+
+/* The older floating console only appears where the dock cannot, so the
+   two are never in the corner together. */
+@media (max-width: 560px) { .ambient-orb { width: 72px; height: 72px; } }
+
+/* ============================================================
+   Company operations console
+   ============================================================ */
+.op-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.memory-entry {
+  display: grid; grid-template-columns: 1fr auto; gap: 0.5rem; align-items: start;
+  padding: 0.6rem 0.75rem; border: 1px solid var(--line); border-radius: 12px;
+  background: rgba(10, 6, 28, 0.55); margin-bottom: 0.5rem;
+}
+.memory-entry .conf {
+  display: inline-block; height: 5px; border-radius: 3px; min-width: 40px;
+  background: linear-gradient(90deg, var(--thorn), var(--gold), var(--good));
+}
+.memory-entry .meta { font-size: 0.72rem; color: var(--ink-faint); }
+.crew-message {
+  padding: 0.5rem 0.7rem; border-left: 3px solid var(--violet); margin: 0.4rem 0;
+  background: rgba(155, 107, 255, 0.08); border-radius: 0 10px 10px 0; font-size: 0.85rem;
+}
+.crew-message.assign { border-left-color: var(--gold); }
+.crew-message.report { border-left-color: var(--good); }
+.crew-message.crosstalk { border-left-color: var(--penguin); font-style: italic; }
+.crew-message.deliverable { border-left-color: var(--thorn); background: rgba(255, 111, 174, 0.12); }
+.crew-message .who { font-size: 0.72rem; color: var(--ink-faint); display: block; }
+.inbox-item {
+  border: 1px solid var(--line); border-radius: 14px; padding: 0.8rem 1rem; margin-bottom: 0.7rem;
+  background: rgba(10, 6, 28, 0.6);
+}
+.inbox-item.pending { border-color: var(--gold); }
+.inbox-item.approved { border-color: var(--good); opacity: 0.75; }
+.inbox-item.rejected { border-color: var(--bad); opacity: 0.6; }
+
+/* ============================================================
+   Quantum page
+   ============================================================ */
+.qubit-grid { display: grid; gap: 0.9rem; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.bloch { position: relative; aspect-ratio: 1; }
+.bloch canvas { width: 100%; height: 100%; display: block; }
+.amp-bars { display: flex; gap: 3px; align-items: flex-end; height: 130px; }
+.amp-bars > div {
+  flex: 1; min-width: 4px; border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, var(--thorn), var(--violet));
+  transition: height 0.25s;
+}
+.circuit {
+  font-family: "Cascadia Code", Consolas, monospace; font-size: 0.74rem; line-height: 1.9;
+  white-space: pre; overflow-x: auto; color: var(--penguin-soft);
+  background: #05030f; border: 1px solid var(--line); border-radius: 12px; padding: 0.8rem;
+}
+.loss-chart { width: 100%; height: 180px; display: block; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.8rem; font-size: 0.86rem; }
+.kv dt { color: var(--ink-faint); }
+.kv dd { margin: 0; font-weight: 600; }
+.bitstream {
+  font-family: "Cascadia Code", Consolas, monospace; font-size: 0.7rem;
+  word-break: break-all; color: var(--penguin-soft); line-height: 1.5;
+}
 .mono { font-family: "Cascadia Code", Consolas, monospace; font-size: 0.82rem; }
 .scroll-x { overflow-x: auto; }
 .center { text-align: center; }
