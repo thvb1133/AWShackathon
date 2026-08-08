@@ -187,6 +187,39 @@ CREATE TABLE IF NOT EXISTS audit_log (
 CREATE INDEX IF NOT EXISTS ix_audit_user ON audit_log (user_id, created_at);
 CREATE INDEX IF NOT EXISTS ix_audit_action ON audit_log (action);
 
+CREATE TABLE IF NOT EXISTS ventures (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id       INTEGER NOT NULL,
+  venture_id    TEXT NOT NULL,
+  name          TEXT NOT NULL,
+  stage         TEXT NOT NULL DEFAULT 'chosen' CHECK (stage IN ('chosen','researching','building','validating','selling','parked')),
+  buyer         TEXT,
+  price_model   TEXT,
+  notes         TEXT,
+  created_at    TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (user_id, venture_id),
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS ix_venture_user ON ventures (user_id, stage);
+
+CREATE TABLE IF NOT EXISTS optimizer_runs (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id       INTEGER,
+  tasks         INTEGER NOT NULL,
+  capacity      INTEGER NOT NULL,
+  optimum       INTEGER NOT NULL,
+  greedy_value  INTEGER,
+  anneal_value  INTEGER,
+  qaoa_value    INTEGER,
+  qaoa_ms       REAL,
+  anneal_ms     REAL,
+  feasible      INTEGER NOT NULL DEFAULT 1,
+  created_at    TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS ix_optrun_created ON optimizer_runs (created_at);
+
 DROP VIEW IF EXISTS v_leaderboard;
 CREATE VIEW v_leaderboard AS
 SELECT
@@ -219,3 +252,16 @@ SELECT engine, COUNT(*) AS total,
        ROUND(AVG(confidence), 3) AS mean_confidence
 FROM classifications
 GROUP BY engine;
+
+-- Measured solver performance, so any quantum claim is backed by this
+-- table rather than by a slide.
+DROP VIEW IF EXISTS v_solver_performance;
+CREATE VIEW v_solver_performance AS
+SELECT
+  COUNT(*) AS runs,
+  SUM(CASE WHEN anneal_value >= optimum THEN 1 ELSE 0 END) AS annealing_optimal,
+  SUM(CASE WHEN qaoa_value  >= optimum THEN 1 ELSE 0 END)  AS qaoa_optimal,
+  ROUND(AVG(anneal_ms), 2) AS mean_annealing_ms,
+  ROUND(AVG(qaoa_ms), 2)   AS mean_qaoa_ms,
+  SUM(CASE WHEN feasible = 0 THEN 1 ELSE 0 END) AS infeasible_plans
+FROM optimizer_runs;

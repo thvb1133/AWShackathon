@@ -95,6 +95,7 @@ const ROUTES = [
   [/\b(mission control|live data|dashboard|nasa)\b/, "mission-control.html"],
   [/\b(agents?|mesh|jarvis console)\b/, "agents.html"],
   [/\b(operations?|company|inbox|memory|automations?|crew)\b/, "company.html"],
+  [/\b(ventures?|business|ideas?|money|optimiser|optimizer|earn)\b/, "ventures.html"],
   [/\b(quiz|test|reflection)\b/, "quiz.html"],
   [/\b(ranking|leaderboard|scores?)\b/, "rankings.html"],
   [/\b(about|story|legend)\b/, "about.html"],

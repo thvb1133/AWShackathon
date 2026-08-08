@@ -35,6 +35,12 @@ declare(strict_types=1);
  *   POST   /api/inbox                    file a draft
  *   POST   /api/inbox/decide             approve or reject
  *
+ *   GET    /api/ventures                 ventures you are pursuing
+ *   POST   /api/ventures                 choose one, or move its stage
+ *   DELETE /api/ventures?id=n            drop it
+ *   POST   /api/optimizer/run            record a mission-optimiser run
+ *   GET    /api/optimizer/stats          measured solver performance
+ *
  *   POST   /api/classify                 quantum ML routing, via Python
  *   GET    /api/ml/compare               quantum against classical, measured
  *   GET    /api/feed?source=apod         server-side cached third-party feed
@@ -310,6 +316,92 @@ if ($route === 'inbox/decide' && $method === 'POST') {
     );
     Http::audit((int) $user['id'], 'inbox_' . $input['decision'], (string) $input['id']);
     Http::ok(['updated' => $changed]);
+}
+
+/* ------------------------------------------------------------------
+   Ventures and the mission optimiser
+   ------------------------------------------------------------------ */
+
+if ($route === 'ventures') {
+    $user = Auth::require();
+    if ($method === 'GET') {
+        Http::ok(['ventures' => Database::all(
+            'SELECT id, venture_id, name, stage, buyer, price_model, notes, created_at, updated_at
+             FROM ventures WHERE user_id = ? ORDER BY updated_at DESC',
+            [$user['id']]
+        )]);
+    }
+    if ($method === 'POST') {
+        $input = Http::validate([
+            'venture_id'  => 'required|string|max:40',
+            'name'        => 'required|string|max:120',
+            'stage'       => 'string|in:chosen,researching,building,validating,selling,parked',
+            'buyer'       => 'string|max:190',
+            'price_model' => 'string|max:60',
+            'notes'       => 'string|max:2000',
+        ]);
+        // Choosing the same venture twice is a stage change, not a duplicate.
+        $existing = Database::value(
+            'SELECT id FROM ventures WHERE user_id = ? AND venture_id = ?',
+            [$user['id'], $input['venture_id']]
+        );
+        if ($existing) {
+            Database::run(
+                'UPDATE ventures SET stage = ?, notes = ?, updated_at = ? WHERE id = ? AND user_id = ?',
+                [$input['stage'] ?? 'chosen', $input['notes'] ?? null, date('Y-m-d H:i:s'), $existing, $user['id']]
+            );
+            Http::ok(['id' => (int) $existing, 'updated' => true]);
+        }
+        $id = Database::insert(
+            'INSERT INTO ventures (user_id, venture_id, name, stage, buyer, price_model, notes)
+             VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [
+                $user['id'], $input['venture_id'], $input['name'], $input['stage'] ?? 'chosen',
+                $input['buyer'] ?? null, $input['price_model'] ?? null, $input['notes'] ?? null,
+            ]
+        );
+        Http::audit((int) $user['id'], 'venture_chosen', $input['name']);
+        Http::ok(['id' => $id, 'updated' => false], 201);
+    }
+    if ($method === 'DELETE') {
+        $id = (int) Http::query('id', 0);
+        Http::ok(['removed' => Database::affected('DELETE FROM ventures WHERE id = ? AND user_id = ?', [$id, $user['id']])]);
+    }
+}
+
+if ($route === 'optimizer/run' && $method === 'POST') {
+    $user  = Auth::current();
+    $input = Http::validate([
+        'tasks'        => 'required|int|min:1|max:64',
+        'capacity'     => 'required|int|min:1',
+        'optimum'      => 'required|int|min:0',
+        'greedy_value' => 'int|min:0',
+        'anneal_value' => 'int|min:0',
+        'qaoa_value'   => 'int|min:0',
+        'anneal_ms'    => 'float|min:0',
+        'qaoa_ms'      => 'float|min:0',
+        'feasible'     => 'bool',
+    ]);
+    $id = Database::insert(
+        'INSERT INTO optimizer_runs (user_id, tasks, capacity, optimum, greedy_value, anneal_value, qaoa_value, anneal_ms, qaoa_ms, feasible)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [
+            $user ? (int) $user['id'] : null,
+            $input['tasks'], $input['capacity'], $input['optimum'],
+            $input['greedy_value'] ?? null, $input['anneal_value'] ?? null, $input['qaoa_value'] ?? null,
+            $input['anneal_ms'] ?? null, $input['qaoa_ms'] ?? null,
+            isset($input['feasible']) ? (int) $input['feasible'] : 1,
+        ]
+    );
+    Http::ok(['id' => $id], 201);
+}
+
+if ($route === 'optimizer/stats' && $method === 'GET') {
+    Http::ok([
+        'performance' => Database::one('SELECT * FROM v_solver_performance'),
+        'note' => 'Measured from real runs recorded by this database, not asserted. '
+                . 'If the quantum column does not beat the classical one, that is the finding.',
+    ]);
 }
 
 /* ------------------------------------------------------------------

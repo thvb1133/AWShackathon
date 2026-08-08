@@ -82,6 +82,32 @@ export const CREWS = {
       { role: "Interpreter", ask: (brief) => `why does ${brief} matter`, kind: "reflect" },
     ],
   },
+  "venture-proposal": {
+    id: "venture-proposal",
+    name: "Commercial Proposal Crew",
+    emoji: "💼",
+    blurb: "Turns a venture idea into a costed proposal: the buyer, the price, the technical claim and the honest caveat.",
+    triggers: ["proposal", "pitch", "quote", "client", "customer", "sell", "pricing", "business case"],
+    steps: [
+      { role: "Market analyst", ask: (brief) => `sector analysis ${brief}`, kind: "lookup" },
+      { role: "Solutions engineer", ask: (brief) => `outline architecture for ${brief}`, kind: "calculate" },
+      { role: "Data officer", ask: (brief) => `live data source for ${brief}`, kind: "live" },
+      { role: "Technical writer", ask: (brief) => `python code for ${brief}`, kind: "code" },
+    ],
+  },
+  "venture-scout": {
+    id: "venture-scout",
+    name: "Venture Scouting Crew",
+    emoji: "🔎",
+    blurb: "Checks whether a space software idea is worth your week: who buys it, what data it needs, what blocks it.",
+    triggers: ["idea", "venture", "opportunity", "worth building", "should i build", "startup", "product idea"],
+    steps: [
+      { role: "Domain researcher", ask: (brief) => brief, kind: "lookup" },
+      { role: "Competitive scout", ask: (brief) => `companies working on ${brief}`, kind: "lookup" },
+      { role: "Feasibility engineer", ask: (brief) => `outline architecture for ${brief}`, kind: "calculate" },
+      { role: "Sceptic", ask: (brief) => `why would ${brief} fail`, kind: "reflect" },
+    ],
+  },
   "build-it": {
     id: "build-it",
     name: "Engineering Crew",

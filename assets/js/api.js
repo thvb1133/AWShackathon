@@ -156,6 +156,18 @@ export const serverMl = {
   compare: () => request("ml/compare"),
 };
 
+export const serverVentures = {
+  all: () => request("ventures", { auth: true }),
+  choose: (venture) => request("ventures", { method: "POST", auth: true, body: venture }),
+  drop: (id) => request(`ventures?id=${encodeURIComponent(id)}`, { method: "DELETE", auth: true }),
+};
+
+export const serverOptimizer = {
+  /** Records a solver comparison so any quantum claim is backed by data. */
+  record: (run) => request("optimizer/run", { method: "POST", auth: signedIn(), body: run }),
+  stats: () => request("optimizer/stats"),
+};
+
 export const serverFeeds = {
   get: (source) => request(`feed?source=${encodeURIComponent(source)}`),
 };

@@ -13,6 +13,7 @@ export const NAV = [
   { href: "index.html", label: "Home", icon: "🏠" },
   { href: "jarvis.html", label: "JARVIS", icon: "🔮" },
   { href: "company.html", label: "Operations", icon: "🏢" },
+  { href: "ventures.html", label: "Ventures", icon: "💼" },
   { href: "classroom.html", label: "Classroom", icon: "🪐" },
   { href: "cosmos.html", label: "Live Cosmos", icon: "🌍" },
   { href: "orbitlab.html", label: "Orbit Lab", icon: "🛰️" },

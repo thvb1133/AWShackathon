@@ -251,6 +251,45 @@ CREATE TABLE IF NOT EXISTS audit_log (
   CONSTRAINT fk_audit_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ------------------------------------------------------------
+-- Ventures the cadet has chosen to pursue, and the measured
+-- performance of the mission optimiser behind idea #31.
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS ventures (
+  id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id       INT UNSIGNED    NOT NULL,
+  venture_id    VARCHAR(40)     NOT NULL,
+  name          VARCHAR(120)    NOT NULL,
+  stage         ENUM('chosen','researching','building','validating','selling','parked') NOT NULL DEFAULT 'chosen',
+  buyer         VARCHAR(190)        NULL,
+  price_model   VARCHAR(60)         NULL,
+  notes         TEXT                NULL,
+  created_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_venture (user_id, venture_id),
+  KEY ix_venture_user (user_id, stage),
+  CONSTRAINT fk_venture_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS optimizer_runs (
+  id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id       INT UNSIGNED        NULL,
+  tasks         SMALLINT UNSIGNED NOT NULL,
+  capacity      INT UNSIGNED    NOT NULL,
+  optimum       INT UNSIGNED    NOT NULL,
+  greedy_value  INT UNSIGNED        NULL,
+  anneal_value  INT UNSIGNED        NULL,
+  qaoa_value    INT UNSIGNED        NULL,
+  qaoa_ms       DECIMAL(10,2)       NULL,
+  anneal_ms     DECIMAL(10,2)       NULL,
+  feasible      TINYINT(1)      NOT NULL DEFAULT 1,
+  created_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY ix_optrun_created (created_at),
+  CONSTRAINT fk_optrun_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ============================================================
 --  Views — the leaderboard is a query, not an application loop
 -- ============================================================
@@ -296,3 +335,15 @@ SELECT
   ROUND(AVG(confidence), 3)                                 AS mean_confidence
 FROM classifications
 GROUP BY engine;
+
+-- Measured solver performance, so any quantum claim is backed by this
+-- table rather than by a slide.
+CREATE OR REPLACE VIEW v_solver_performance AS
+SELECT
+  COUNT(*)                                                  AS runs,
+  SUM(CASE WHEN anneal_value >= optimum THEN 1 ELSE 0 END)  AS annealing_optimal,
+  SUM(CASE WHEN qaoa_value  >= optimum THEN 1 ELSE 0 END)   AS qaoa_optimal,
+  ROUND(AVG(anneal_ms), 2)                                  AS mean_annealing_ms,
+  ROUND(AVG(qaoa_ms), 2)                                    AS mean_qaoa_ms,
+  SUM(CASE WHEN feasible = 0 THEN 1 ELSE 0 END)             AS infeasible_plans
+FROM optimizer_runs;
