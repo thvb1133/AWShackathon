@@ -8,7 +8,7 @@
    labels every answer with where it came from.
    ============================================================ */
 
-const VERSION = "beyond-orbit-v3";
+const VERSION = "beyond-orbit-v4";
 
 const SHELL = [
   "./",
@@ -34,6 +34,7 @@ const SHELL = [
   "manifest.webmanifest",
   "assets/css/style.css",
   "assets/js/agents.js",
+  "assets/js/api.js",
   "assets/js/ambient.js",
   "assets/js/automate.js",
   "assets/js/companies.js",

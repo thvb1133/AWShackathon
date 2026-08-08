@@ -139,8 +139,17 @@ function buildNav(active) {
     links.classList.toggle("open");
     e.currentTarget.setAttribute("aria-expanded", links.classList.contains("open"));
   });
-  nav.querySelector("#logout-btn")?.addEventListener("click", () => {
+  nav.querySelector("#logout-btn")?.addEventListener("click", async () => {
     stopSpeaking();
+    // If this was a PHP-backed session, invalidate the server token before
+    // navigating away. Navigating first cancels the fetch and leaves a
+    // bearer token sitting in localStorage.
+    try {
+      const api = await import("./api.js");
+      await api.logout();
+    } catch {
+      // api.logout() clears its token in finally; a missing API is harmless.
+    }
     logout();
     window.location.href = "index.html";
   });

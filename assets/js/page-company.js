@@ -7,6 +7,7 @@ import * as auto from "./automate.js";
 import * as hooks from "./integrations.js";
 import { AGENT_COUNT } from "./agents.js";
 import { speak } from "./voice.js";
+import * as api from "./api.js";
 
 initShell("company.html");
 
@@ -39,6 +40,53 @@ function paintStatus() {
       <div class="muted" style="font-size:.75rem">${escapeHtml(note)}</div></div>`)
     .join("");
 }
+
+/* ==================================================================
+   Optional PHP / database backend
+   ================================================================== */
+async function paintBackend() {
+  const out = document.getElementById("api-status");
+  const state = await api.describeBackend();
+  document.getElementById("api-url").value = api.configuredUrl();
+  if (state.mode === "connected") {
+    out.innerHTML = `<div class="inbox-item approved">
+      <b><span class="tick">✓</span> Server connected</b>
+      <span class="chip">${escapeHtml(state.driver)}</span>
+      <span class="chip">${escapeHtml(state.schema)}</span>
+      <span class="chip">${state.python ? "⚛️ Python ML online" : "Python ML offline"}</span>
+      <p class="muted mono" style="font-size:.78rem">${escapeHtml(state.url)}</p>
+      <p class="muted" style="font-size:.82rem">${state.users} database account(s). New registrations on this origin use bcrypt and a real server session.</p>
+    </div>`;
+  } else {
+    out.innerHTML = `<div class="inbox-item">
+      <b>Static/offline mode</b>
+      <p class="muted" style="font-size:.84rem">No PHP endpoint answered at <span class="mono">${escapeHtml(state.url)}</span>.
+      The app remains fully usable with browser storage. Start the two commands above, or paste a deployed API URL, to turn on the database.</p>
+    </div>`;
+  }
+}
+
+document.getElementById("btn-save-api").addEventListener("click", () => {
+  api.configure(document.getElementById("api-url").value);
+  toast("🖥️ API URL saved. Testing it now.");
+  paintBackend();
+});
+document.getElementById("btn-check-api").addEventListener("click", async () => {
+  await api.health({ force: true });
+  paintBackend();
+});
+document.getElementById("btn-install-api").addEventListener("click", async () => {
+  try {
+    const base = api.baseUrl();
+    const response = await fetch(`${base}/install`, { method: "POST" });
+    const data = await response.json();
+    if (!response.ok || !data.ok) throw new Error(data.error || `HTTP ${response.status}`);
+    toast(`🗄️ ${data.driver} schema installed — ${data.applied} statement(s).`, "good");
+    await paintBackend();
+  } catch (error) {
+    toast(`Install failed: ${escapeHtml(error.message)}`, "bad");
+  }
+});
 
 /* ==================================================================
    Memory
@@ -519,5 +567,6 @@ paintJobs();
 paintInbox();
 paintConnections();
 paintStatus();
+paintBackend();
 
 if (location.hash === "#inbox") document.getElementById("inbox").scrollIntoView({ behavior: "smooth" });

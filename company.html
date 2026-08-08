@@ -21,6 +21,35 @@
 
     <div class="op-grid" id="status-strip"></div>
 
+    <!-- ============ Server ============ -->
+    <section class="card mt" id="server">
+      <h2>🖥️ PHP, database &amp; Python ML server</h2>
+      <p class="muted">The static application works without a server. Connect this optional backend when you want real
+         bcrypt accounts, a SQLite/MySQL database, data that follows you to another device, server-side JPL feed access,
+         and the Python quantum-kernel classifier.</p>
+      <div class="codex-toolbar">
+        <div class="field"><label for="api-url">API base URL</label>
+          <input id="api-url" placeholder="Same origin /api (leave blank when PHP serves this site)"></div>
+        <button class="btn small" id="btn-check-api">Test server</button>
+        <button class="btn ghost small" id="btn-save-api">Save URL</button>
+        <button class="btn ghost small" id="btn-install-api">Install SQLite schema</button>
+      </div>
+      <div class="mt" id="api-status"></div>
+      <details class="mt">
+        <summary class="btn small ghost" style="display:inline-flex">How to run it locally</summary>
+        <pre class="code"><code># Terminal 1 — Python ML
+python3 server/python/service.py
+
+# Terminal 2 — PHP serves both the site and /api
+php -S 127.0.0.1:8081 server/router.php
+
+# One-time SQLite install
+curl -X POST http://127.0.0.1:8081/api/install</code></pre>
+        <p class="muted">Then open <span class="mono">http://127.0.0.1:8081</span>. Full MySQL/MariaDB deployment
+           instructions are in <span class="mono">server/README.md</span>.</p>
+      </details>
+    </section>
+
     <!-- ============ Memory ============ -->
     <section class="card mt" id="memory">
       <h2>🧠 Memory — so you never explain twice</h2>

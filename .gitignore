@@ -1,0 +1,11 @@
+# PHP / database runtime state
+server/.env
+server/data/
+
+# Python runtime
+server/python/__pycache__/
+*.py[cod]
+
+# Local test artifacts and node modules
+node_modules/
+.DS_Store

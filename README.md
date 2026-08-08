@@ -6,7 +6,9 @@ a 3D Solar System driven by orbital mechanics, live satellite tracking, public N
 everything humankind has found beyond Earth, a mesh of 527 specialist agents, quantum machine learning that routes every
 request, and a pink-and-purple orb that listens to your voice and answers out loud.
 
-Static site. No build step, no framework, no server, no database, and no API key required to use any of it.
+The browser experience has no build step and needs no account or API key. It can run fully static, or it can be
+upgraded with the included PHP, SQLite/MySQL and Python ML services when you want real database accounts and
+cross-device persistence.
 
 ---
 
@@ -36,8 +38,26 @@ npx serve -l 8080
 ### PHP
 
 ```bash
+# Static-only PHP server
 php -S localhost:8080
 ```
+
+### Full PHP + database + Python ML server
+
+This is the version to run when you want accounts stored with bcrypt, a real SQLite/MySQL database, server-side JPL
+feeds, and Python quantum-kernel classification:
+
+```bash
+# Terminal 1 — Python/NumPy machine-learning service
+python3 server/python/service.py
+
+# Terminal 2 — PHP serves both the website and /api
+php -S 127.0.0.1:8081 server/router.php
+```
+
+Then open **<http://127.0.0.1:8081>**, go to **Operations**, and press **Install SQLite schema** once. SQLite is the
+zero-setup default; switch to MySQL/MariaDB in `server/.env` when deploying. Full database setup, endpoint and
+production server instructions live in [`server/README.md`](server/README.md).
 
 ### VS Code
 
@@ -94,6 +114,10 @@ Upload the whole folder by FTP, or drop it in your university web space. It is p
 **One caveat that applies everywhere:** the microphone and the service worker need a **secure context**, meaning HTTPS
 or `localhost`. All four options above give you HTTPS automatically. Plain `http://` on a public IP will load the pages
 but will refuse the microphone.
+
+**PHP/database caveat:** GitHub Pages, Netlify Drop and static Cloudflare Pages serve the offline/static mode only.
+Deploy `server/` to a PHP host (shared LAMP hosting, a VPS, Render with PHP, etc.) when you want server accounts,
+SQLite/MySQL and Python ML. The frontend detects a missing API and keeps working locally rather than breaking.
 
 ---
 

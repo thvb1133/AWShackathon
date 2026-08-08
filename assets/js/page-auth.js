@@ -1,7 +1,8 @@
 /* Login and registration. One controller, two modes, real validation. */
 
 import { initShell, toast, escapeHtml } from "./ui.js";
-import { registerUser, loginUser, getUsers, currentUser } from "./store.js";
+import { registerUser, loginUser, getUsers, currentUser, saveServerProfile } from "./store.js";
+import { health as apiHealth, register as apiRegister, login as apiLogin } from "./api.js";
 import { speak } from "./voice.js";
 
 const mode = document.body.dataset.mode;
@@ -65,6 +66,10 @@ for (const input of form.querySelectorAll("input")) {
 
 /* ------------------------------------------------------- submit */
 form.addEventListener("submit", (e) => {
+  handleSubmit(e);
+});
+
+async function handleSubmit(e) {
   e.preventDefault();
   setError("form", "");
   if (!validate()) {
@@ -73,21 +78,39 @@ form.addEventListener("submit", (e) => {
   }
 
   try {
+    /* Same page, two deployment modes:
+       - PHP API is reachable: bcrypt account and database session.
+       - Static Pages/Netlify deployment: local coursework account.
+       The user sees which one was used in the success toast. */
+    const backend = await apiHealth();
     if (mode === "register") {
-      const user = registerUser({
+      const payload = {
         username: field("username").value,
         email: field("email").value,
         phone: field("phone").value,
         address: field("address").value,
         password: field("password").value,
         avatar: field("avatar").value,
-      });
-      loginUser(user.username, field("password").value);
-      toast(`🚀 Welcome aboard, cadet ${escapeHtml(user.username)}.`, "good");
+      };
+      const user = backend.available
+        ? (await apiRegister(payload)).user
+        : registerUser(payload);
+      if (backend.available) saveServerProfile(user);
+      else loginUser(user.username, field("password").value);
+      toast(
+        `🚀 Welcome aboard, cadet ${escapeHtml(user.username)}.${backend.available ? " Your account is saved in the database." : " Saved in this browser."}`,
+        "good"
+      );
       speak(`Welcome aboard, cadet ${user.username}. The classroom is open.`, "thorn");
     } else {
-      const user = loginUser(field("username").value, field("password").value);
-      toast(`🛰️ Airlock open. Welcome back, ${escapeHtml(user.username)}.`, "good");
+      const user = backend.available
+        ? (await apiLogin(field("username").value, field("password").value)).user
+        : loginUser(field("username").value, field("password").value);
+      if (backend.available) saveServerProfile(user);
+      toast(
+        `🛰️ Airlock open. Welcome back, ${escapeHtml(user.username)}.${backend.available ? " Server session active." : ""}`,
+        "good"
+      );
       speak(`Welcome back, cadet ${user.username}.`, "penguin");
     }
     // Give the toast a moment before the page changes underneath it.
@@ -98,4 +121,4 @@ form.addEventListener("submit", (e) => {
     setError("form", error.message);
     toast(escapeHtml(error.message), "bad");
   }
-});
+}
