@@ -146,6 +146,4 @@ assets/vendor/                three.js and satellite.js, vendored
 
 ---
 
-*Beejalben Amitkumar Patel · M01035595 · Web Application & Database*
-
 > “Every orbit we travel is a circle within our own soul.”
