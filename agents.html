@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Agent Mesh · Beyond Orbit</title>
+<meta name="description" content="A mesh of over five hundred specialist space agents running entirely in your browser — ask by voice or keyboard.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🤖</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <div class="wrap">
+    <h1>🤖 The Beyond Orbit Mesh</h1>
+    <p class="muted" id="mesh-intro">Booting the mesh…</p>
+    <div class="stat-strip mt" id="mesh-stats"></div>
+
+    <section class="card mt">
+      <h2>🎛️ Task console</h2>
+      <p class="muted">Describe what you need. The router scores every agent against your words, runs the strongest few in
+         parallel, and shows each report with the agent that produced it.</p>
+      <form id="task-form" class="codex-toolbar">
+        <div class="field">
+          <label for="task">Your request</label>
+          <input id="task" placeholder="where is the ISS right now" autocomplete="off">
+        </div>
+        <div class="field" style="flex:0 0 130px">
+          <label for="fanout">Agents to run</label>
+          <select id="fanout"><option>1</option><option selected>3</option><option>5</option><option>8</option></select>
+        </div>
+        <button class="btn primary small" type="submit">Dispatch</button>
+        <button class="btn small ghost" type="button" id="btn-mic">🎙️ Speak</button>
+      </form>
+      <div class="pill-row mt" id="examples"></div>
+      <div id="routing" class="mt"></div>
+      <div id="console-out" class="console-out mt"></div>
+    </section>
+
+    <section class="card mt">
+      <h2>🗂️ Browse every agent</h2>
+      <div class="codex-toolbar">
+        <div class="field"><label for="agent-q">Filter</label><input id="agent-q" placeholder="propulsion, ISRO, Titan, Starlink…"></div>
+        <div class="field" style="flex:0 0 260px"><label for="agent-domain">Domain</label><select id="agent-domain"></select></div>
+      </div>
+      <p class="muted mt" id="agent-count"></p>
+      <div class="agent-grid" id="agent-list"></div>
+      <p class="center mt"><button class="btn ghost" id="agent-more" hidden>Show more agents</button></p>
+    </section>
+
+    <section class="card mt">
+      <h2>What this is, honestly</h2>
+      <p>This mesh is not a large language model and there is no server behind it. Every agent is a small deterministic
+         specialist, and that is deliberate — it means each answer can be traced to its origin:</p>
+      <ul>
+        <li><b>Calculating agents</b> solve real equations: Kepler, Tsiolkovsky, Hohmann, SGP4, J2 precession,
+            free-space path loss, radiative equilibrium.</li>
+        <li><b>Knowledge agents</b> return codex records that cite who discovered the thing and when.</li>
+        <li><b>Feed agents</b> call named public APIs — NASA, JPL, NOAA, CelesTrak, The Space Devs — and label whether
+            the answer came live, from cache, or from the bundled snapshot.</li>
+      </ul>
+      <p>Nothing here hallucinates a number, because nothing here is capable of inventing one. If an agent cannot
+         answer, it says so.</p>
+    </section>
+  </div>
+</main>
+<script type="module" src="assets/js/page-agents.js"></script>
+</body>
+</html>

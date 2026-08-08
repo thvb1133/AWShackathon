@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Earth Orbit Laboratory · Beyond Orbit</title>
+<meta name="description" content="Real satellites flown live around a 3D Earth using NORAD two-line elements and the SGP4 model.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🛰️</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <div class="wrap">
+    <h1>🛰️ Earth Orbit Laboratory</h1>
+    <p class="muted">Live two-line element sets from CelesTrak, propagated in your browser with the NORAD SGP4 model.
+       If a marker is over the Coral Sea, that satellite is over the Coral Sea.</p>
+
+    <div class="card">
+      <div class="codex-toolbar">
+        <div class="field">
+          <label for="group-select">Satellite group</label>
+          <select id="group-select"></select>
+        </div>
+        <div class="field" style="flex:0 0 auto">
+          <label for="sat-search">Find by name</label>
+          <input id="sat-search" placeholder="ISS, HUBBLE, NOAA…" style="min-width:180px">
+        </div>
+        <button class="btn small" id="btn-load">Load group</button>
+        <button class="btn small ghost" id="btn-now">Now</button>
+        <button class="btn small ghost" id="btn-shells">Reference shells: on</button>
+        <button class="btn small ghost" id="btn-focus">Follow selected</button>
+      </div>
+      <p class="hint mt" id="load-status">Loading live elements…</p>
+    </div>
+
+    <div class="cosmos-shell mt">
+      <canvas id="orbit-canvas" aria-label="Interactive 3D globe with live satellites"></canvas>
+      <div class="hud" id="hud-left">
+        <h4>Catalogue</h4>
+        <div class="row"><span>Objects flying</span><span id="hud-count">0</span></div>
+        <div class="row"><span>Clock</span><span id="hud-clock">—</span></div>
+        <div class="row"><span>Time rate</span><span id="hud-rate">1×</span></div>
+        <div class="row"><span>Elements</span><span id="hud-source">—</span></div>
+        <hr style="border-color:var(--line);margin:.5rem 0">
+        <div class="row"><span><span class="dot" style="background:#5ce6a8"></span> LEO</span><span id="cnt-leo">0</span></div>
+        <div class="row"><span><span class="dot" style="background:#ffd166"></span> MEO</span><span id="cnt-meo">0</span></div>
+        <div class="row"><span><span class="dot" style="background:#ff6fae"></span> GEO</span><span id="cnt-geo">0</span></div>
+        <div class="row"><span><span class="dot" style="background:#9b6bff"></span> High</span><span id="cnt-heo">0</span></div>
+      </div>
+      <aside class="hud right">
+        <h4 id="sel-name">Click a satellite</h4>
+        <p class="muted" style="font-size:.8rem" id="sel-hint">Every dot is a real tracked object. Click one to read its state vector and draw its ground track.</p>
+        <div id="sel-body"></div>
+      </aside>
+      <div class="time-bar">
+        <label class="sr-only" for="rate-select">Time rate</label>
+        <select id="rate-select" style="width:auto">
+          <option value="1" selected>Real time</option>
+          <option value="10">10×</option>
+          <option value="60">60×</option>
+          <option value="600">600×</option>
+          <option value="3600">1 hour / sec</option>
+        </select>
+        <span class="muted" id="track-note">Gold line: the orbital path ahead. Green line: the shadow it casts on the ground.</span>
+      </div>
+      <div class="loading-cosmos" id="lab-loading">SPINNING UP THE GLOBE…</div>
+    </div>
+
+    <div class="split mt">
+      <section class="card">
+        <h2>Pass predictor</h2>
+        <p class="muted">When will the selected satellite rise above your horizon? SGP4 is scanned forward 24 hours.</p>
+        <div class="codex-toolbar">
+          <div class="field"><label for="obs-lat">Latitude</label><input id="obs-lat" type="number" step="0.001" value="51.5074"></div>
+          <div class="field"><label for="obs-lon">Longitude</label><input id="obs-lon" type="number" step="0.001" value="-0.1278"></div>
+          <button class="btn small" id="btn-passes">Predict</button>
+          <button class="btn small ghost" id="btn-locate">Use my location</button>
+        </div>
+        <div id="pass-out" class="mt"></div>
+      </section>
+      <section class="card">
+        <h2>How this works</h2>
+        <ul>
+          <li><b>TLE</b> — a two-line element set, the 69-character format NORAD has published since the 1960s.</li>
+          <li><b>SGP4</b> — the simplified perturbations model that turns those elements into a position, accounting for
+              drag and the Earth's equatorial bulge.</li>
+          <li>Accuracy is roughly a kilometre near the element epoch, degrading over days. That is why the app re-fetches.</li>
+          <li>Colour is the orbital regime: green LEO, gold MEO, pink the geostationary belt, violet high or elliptical.</li>
+          <li>If CelesTrak cannot be reached, a bundled snapshot flies instead and the status line says so.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</main>
+<script type="module" src="assets/js/page-orbitlab.js"></script>
+</body>
+</html>

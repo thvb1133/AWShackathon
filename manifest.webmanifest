@@ -1,0 +1,20 @@
+{
+  "name": "Beyond Orbit: A Tale of Two Souls",
+  "short_name": "Beyond Orbit",
+  "description": "A living cosmic classroom: real 3D solar system, live satellite tracking, NASA open data and a mesh of 500+ agents you can talk to.",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#05030f",
+  "theme_color": "#05030f",
+  "categories": ["education", "science", "utilities"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%2305030f'/%3E%3Ccircle cx='256' cy='240' r='120' fill='%239b6bff'/%3E%3Ccircle cx='215' cy='200' r='40' fill='%23ffb0d4'/%3E%3Cellipse cx='256' cy='250' rx='210' ry='48' fill='none' stroke='%234fd7ff' stroke-width='10'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

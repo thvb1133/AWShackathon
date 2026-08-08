@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ventures · Beyond Orbit</title>
+<meta name="description" content="Fifty space, AI and quantum software businesses, scored for what you can actually build — plus a working satellite mission optimiser comparing classical and quantum solvers.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>💼</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <div class="wrap">
+    <h1 class="gradient-text">💼 Ventures</h1>
+    <p class="muted">Fifty space, AI and quantum software businesses — as structured data you can sort, not a list to
+       admire. Each one records who pays, what they pay, what data it needs, and what genuinely blocks it.</p>
+
+    <section class="card" id="reality-check">
+      <h2>⚠️ Read this before anything else</h2>
+      <p>This page prepares work. It does not earn money on its own, and nothing on it should be read as a promise
+         that it will.</p>
+      <ul>
+        <li><b>Software can do:</b> run analyses on a schedule while you sleep, draft proposals, price a product, build
+            the technical artefact, and put finished work in front of you to approve with one click.</li>
+        <li><b>Software cannot do:</b> find customers, earn their trust, sign contracts, take payments you have not set
+            up, or make somebody want the thing. Every business here needs a real person to sell it.</li>
+        <li>The one that pays first is almost never the cleverest. It is the one where you already know somebody with
+            the problem.</li>
+      </ul>
+      <p class="poetic">Automating the work is real. Automating the customers is not.</p>
+    </section>
+
+    <div class="op-grid mt" id="venture-stats"></div>
+
+    <!-- ============ The working product ============ -->
+    <section class="card mt" id="optimizer">
+      <h2>🛰️ Idea #31, actually built: the Mission Optimiser</h2>
+      <p>Of the fifty, this is the one implemented as working software rather than described. A satellite is asked for
+         far more targets than it can fly. Choosing the subset that maximises mission value under a capacity limit is a
+         0/1 knapsack — NP-hard, and exactly the shape that maps onto a QUBO.</p>
+      <p class="muted">Four solvers run on the identical problem: greedy, simulated annealing, exact dynamic programming
+         for ground truth, and a genuine QAOA on the state-vector simulator — cost-phase separator, RX mixer, angle
+         search, then sampling. The verdict below is generated from the measured numbers, so if quantum loses, it says
+         quantum lost.</p>
+
+      <div class="codex-toolbar mt">
+        <div class="field" style="flex:0 0 170px"><label for="opt-count">Targets requested</label>
+          <select id="opt-count"><option>8</option><option selected>12</option><option>14</option><option value="18">18 (too big for QAOA)</option></select></div>
+        <div class="field" style="flex:0 0 150px"><label for="opt-layers">QAOA layers</label>
+          <select id="opt-layers"><option>1</option><option selected>2</option><option>3</option></select></div>
+        <div class="field" style="flex:0 0 140px"><label for="opt-seed">Problem seed</label>
+          <input id="opt-seed" type="number" value="7"></div>
+        <button class="btn primary small" id="btn-optimize">Solve it</button>
+        <button class="btn small" id="btn-benchmark">Benchmark 8 instances</button>
+      </div>
+
+      <div id="opt-result" class="mt"></div>
+      <div id="opt-plan" class="mt"></div>
+    </section>
+
+    <!-- ============ The fifty ============ -->
+    <section class="card mt" id="catalogue">
+      <h2>📇 The fifty, ranked for you</h2>
+      <p class="muted">Sorted by how cheaply <em>you</em> can test them: free data, difficulty, skills already in this
+         repository, and recurring revenue. This ranks what to try first — it never predicts what will succeed.</p>
+      <div class="codex-toolbar">
+        <div class="field"><label for="v-search">Search</label><input id="v-search" placeholder="flood, quantum, insurance, API…"></div>
+        <div class="field" style="flex:0 0 230px"><label for="v-category">Category</label><select id="v-category"></select></div>
+        <div class="field" style="flex:0 0 190px"><label for="v-difficulty">Difficulty at most</label>
+          <select id="v-difficulty">
+            <option value="5">Any</option><option value="1">1 — weekend</option><option value="2" selected>2 — solo buildable</option>
+            <option value="3">3 — needs paid data</option><option value="4">4 — regulated</option>
+          </select></div>
+        <label class="chip" style="cursor:pointer"><input type="checkbox" id="v-free" checked style="width:auto"> Free data only</label>
+        <label class="chip" style="cursor:pointer"><input type="checkbox" id="v-quantum" style="width:auto"> Favour quantum</label>
+      </div>
+      <p class="muted mt" id="v-count"></p>
+      <div class="codex-grid" id="venture-list"></div>
+    </section>
+
+    <!-- ============ Plan ============ -->
+    <section class="card mt" id="plan">
+      <h2>🗺️ Your first week on the chosen idea</h2>
+      <p class="muted" id="plan-empty">Pick an idea above and its build plan appears here — ending at validation, not
+         at launch, because the expensive mistake is building for six months before discovering nobody wanted it.</p>
+      <div id="plan-body"></div>
+      <div class="lesson-actions mt" id="plan-actions" hidden>
+        <button class="btn primary small" id="btn-run-crew">👥 Send it to the proposal crew now</button>
+        <button class="btn small" id="btn-schedule">⏰ Work on it overnight, every night</button>
+        <button class="btn ghost small" id="btn-remember">🧠 Remember this is my venture</button>
+      </div>
+      <div id="plan-output" class="mt"></div>
+    </section>
+
+    <!-- ============ Overnight ============ -->
+    <section class="card mt" id="overnight">
+      <h2>🌙 What actually runs while you sleep</h2>
+      <p class="muted">Honest mechanics, in one place. Scheduled crews run while a Beyond Orbit tab is open, including
+         in the background. Close every tab and the schedule pauses; open one and anything overdue runs immediately, so
+         you return to finished work. Each run files a draft into the approval inbox and nothing is sent anywhere until
+         you approve it.</p>
+      <div class="grid three mt" id="overnight-jobs"></div>
+      <p class="lesson-actions">
+        <a class="btn small" href="company.html#inbox">📥 Open the approval inbox</a>
+        <a class="btn ghost small" href="company.html#automations">⏰ Manage automations</a>
+      </p>
+      <p class="hint">For genuinely unattended overnight running you need a machine that stays awake — leave this open
+         on a desktop, or run the same briefs from the PHP server on a host that does not sleep.</p>
+    </section>
+  </div>
+</main>
+<script type="module" src="assets/js/page-ventures.js"></script>
+</body>
+</html>

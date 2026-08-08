@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nebula">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About · Beyond Orbit</title>
+<meta name="description" content="The legend of MRS THORN BIRD and MR PENGUIN, and the engineering behind Beyond Orbit.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📖</text></svg>">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{ "imports": { "three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <div class="wrap">
+    <h1>📖 The Legend of MRS THORN BIRD &amp; MR PENGUIN</h1>
+
+    <div class="two-souls">
+      <article class="card thorn">
+        <h2>🪶 MRS THORN BIRD — the soul</h2>
+        <p>The legend says the thorn bird searches its whole life for the sharpest thorn, and then sings its most
+           beautiful song while dying upon it. The most beautiful things in life are born from sacrifice and destiny.</p>
+        <p>She is emotion, cosmos, planets, sacrifice. She teaches the universe: galaxies, cosmic layers, the web,
+           dark energy — and she teaches them as feelings first and facts second.</p>
+      </article>
+      <article class="card penguin">
+        <h2>🐧 MR PENGUIN — the mind</h2>
+        <p>Cold, practical, technical, and feeling far more than he will admit. He builds rockets, satellites and
+           quantum links. He is the professor: the realistic side of space.</p>
+        <p>He insists the history is told honestly, including the parts that are ugly — von Braun's V-2 was built with
+           concentration-camp labour, and MR PENGUIN will not let that be edited out of a lesson.</p>
+      </article>
+    </div>
+
+    <section class="card mt">
+      <h2>🧑‍🚀 USERKIMCHI — the student</h2>
+      <p>Kimchi is a mixture of both of them: the child, the student, the world they are teaching. When emotion and
+         practicality teach together, the student reaches the stars, the galaxies, the quantum satellites — and wins.</p>
+      <p class="poetic">“Beyond Orbit: A Tale of Two Souls is an odyssey of the heart and mind — where emotion becomes
+         the universe, logic becomes the rocket, and learning becomes a song between stars.”</p>
+    </section>
+
+    <section class="card mt">
+      <h2>🔬 What is actually running under this website</h2>
+      <p>Everything below happens in your browser. There is no back-end server, no database and no account anywhere
+         but this device.</p>
+      <div class="grid two mt" id="tech-grid"></div>
+    </section>
+
+    <section class="card mt">
+      <h2>🛰️ Where the data comes from</h2>
+      <p class="muted">Every feed is free, public and requires no signup. Where a key helps, NASA's shared
+         <span class="mono">DEMO_KEY</span> is used until you supply your own on Mission Control.</p>
+      <div class="scroll-x"><table id="source-table">
+        <thead><tr><th>Source</th><th>Host</th><th>What it gives us</th></tr></thead><tbody></tbody></table></div>
+      <p class="hint">If a source is unreachable the app falls back to its cache, then to a bundled snapshot, and always
+         says which of the three you are looking at.</p>
+    </section>
+
+    <section class="card mt">
+      <h2>🐞 Problems met during development, and how they were fixed</h2>
+      <div class="scroll-x"><table id="bug-table">
+        <thead><tr><th>Problem</th><th>Cause</th><th>Fix</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <section class="card mt">
+      <h2>♿ Built for everybody</h2>
+      <ul>
+        <li>Three themes including a high-contrast mode, and an extra-readable font with wider spacing.</li>
+        <li>Text scaling from 85% to 150% without breaking any layout.</li>
+        <li>Every lesson can be read aloud, in a different voice per mentor.</li>
+        <li>Full keyboard operation; visible focus rings; <span class="mono">prefers-reduced-motion</span> is honoured.</li>
+        <li>Works offline after the first visit, via a service worker.</li>
+        <li>The 3D pages degrade to a clear explanation, not a blank screen, when WebGL is missing.</li>
+      </ul>
+    </section>
+
+    <section class="card mt center">
+      <h2>Beejalben Amitkumar Patel</h2>
+      <p class="muted">Student ID M01035595 · Web Application &amp; Database</p>
+      <p class="poetic">“Every orbit we travel is a circle within our own soul.”</p>
+    </section>
+  </div>
+</main>
+<script type="module" src="assets/js/page-about.js"></script>
+</body>
+</html>
